@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gouniverse/dashboard"
 	"github.com/gouniverse/utils"
 )
 
@@ -12,35 +13,13 @@ func main() {
 	log.Println("1. Initializing environment variables...")
 	utils.EnvInitialize()
 
-	log.Println("3. Initializing CMS...")
-	// myCms, err := cms.NewCms(cms.Config{
-	// 	DbInstance:          db,
-	// 	BlocksEnable:        true,
-	// 	CacheAutomigrate:    true,
-	// 	CacheEnable:         true,
-	// 	EntitiesAutomigrate: true,
-	// 	LogsAutomigrate:     true,
-	// 	LogsEnable:          true,
-	// 	MenusEnable:         true,
-	// 	PagesEnable:         true,
-	// 	SettingsAutomigrate: true,
-	// 	SettingsEnable:      true,
-	// 	SessionAutomigrate:  true,
-	// 	SessionEnable:       true,
-	// 	TemplatesEnable:     true,
-	// 	Prefix:              "cms2",
-	// 	CustomEntityList:    entityList(),
-	// })
+	// log.Println("3. Initializing Dashboard...")
 
-	// if err != nil {
-	// 	log.Panicln(err.Error())
-	// }
-
-	log.Println("4. Starting server on http://" + utils.Env("SERVER_HOST") + ":" + utils.Env("SERVER_PORT") + " ...")
+	log.Println("2. Starting server on http://" + utils.Env("SERVER_HOST") + ":" + utils.Env("SERVER_PORT") + " ...")
 	log.Println("URL: http://" + utils.Env("APP_URL") + " ...")
 	mux := http.NewServeMux()
-	// mux.HandleFunc("/", myCms.Router)
-	// mux.HandleFunc("/cms", myCms.Router)
+	mux.HandleFunc("/", dashboard1)
+	mux.HandleFunc("/dashboard-2", dashboard2)
 
 	srv := &http.Server{
 		Handler: mux,
@@ -53,4 +32,38 @@ func main() {
 	}
 
 	log.Fatal(srv.ListenAndServe())
+}
+
+func dashboard1(w http.ResponseWriter, r *http.Request) {
+	dashboard := dashboard.NewDashboard(dashboard.Config{
+		Menu: []dashboard.MenuItem{
+			{
+				Title: "Dashboard 1",
+				URL:   "/",
+			},
+			{
+				Title: "Dashboard 2",
+				URL:   "/dashboard-2",
+			},
+		},
+	})
+	html := dashboard.ToHTML()
+	w.Write([]byte(html))
+}
+
+func dashboard2(w http.ResponseWriter, r *http.Request) {
+	dashboard := dashboard.NewDashboard(dashboard.Config{
+		Menu: []dashboard.MenuItem{
+			{
+				Title: "Dashboard 1",
+				URL:   "/",
+			},
+			{
+				Title: "Dashboard 2",
+				URL:   "/dashboard-2",
+			},
+		},
+	})
+	html := dashboard.ToHTML()
+	w.Write([]byte(html))
 }

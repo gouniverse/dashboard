@@ -71,25 +71,40 @@ func (d Dashboard) SetMenu(menuItems []MenuItem) Dashboard {
 }
 
 func (d Dashboard) ToHTML() string {
-	styleURLs := append([]string{
+	styleURLs := []string{
 		"//cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css",
 		"//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
 		"//cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css",
-		"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/css/sm-core-css.css",
-		"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/css/sm-simple/sm-simple.min.css",
-		"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/css/sm-blue/sm-blue.min.css",
-		"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/addons/bootstrap-4/jquery.smartmenus.bootstrap-4.css",
-	}, d.StyleURLs...)
+	}
 
-	scriptURLs := append([]string{
+	if d.useSmartMenu {
+		smartMenuStyleURLs := []string{
+			"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/css/sm-core-css.css",
+			"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/css/sm-simple/sm-simple.min.css",
+			"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/css/sm-blue/sm-blue.min.css",
+			"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/addons/bootstrap-4/jquery.smartmenus.bootstrap-4.css",
+		}
+		styleURLs = append(styleURLs, smartMenuStyleURLs...)
+	}
+
+	styleURLs = append(styleURLs, d.StyleURLs...)
+
+	scriptURLs := []string{
 		"//code.jquery.com/jquery-1.11.0.min.js",
 		"//cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js",
-		"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/jquery.smartmenus.min.js",
-		// "//unpkg.com/htmx.org@1.8.0",
-	}, d.ScriptURLs...)
+	}
+
+	if d.useSmartMenu {
+		smartMenuScriptURLs := []string{
+			"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/jquery.smartmenus.min.js",
+		}
+		scriptURLs = append(scriptURLs, smartMenuScriptURLs...)
+	}
+
+	scriptURLs = append(scriptURLs, d.ScriptURLs...)
 
 	webpage := hb.NewWebpage()
-	webpage.SetTitle(d.Title + " | Admin | Rem.land")
+	webpage.SetTitle(d.Title)
 	webpage.AddStyleURLs(styleURLs)
 	webpage.AddStyle("html,body{width:100%; height:100%;}")
 	webpage.AddStyle(d.styles())
