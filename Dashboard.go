@@ -74,9 +74,7 @@ func (d Dashboard) SetMenu(menuItems []MenuItem) Dashboard {
 
 func (d Dashboard) ToHTML() string {
 	styleURLs := []string{
-		// "//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
 		cdn.BootstrapIconsCss191(),
-		uncdn.BootstrapCss521(),
 	}
 
 	if d.useSmartMenu {
@@ -91,10 +89,7 @@ func (d Dashboard) ToHTML() string {
 
 	styleURLs = append(styleURLs, d.StyleURLs...)
 
-	scriptURLs := []string{
-		uncdn.Jquery360(),
-		uncdn.BootstrapCss521(),
-	}
+	scriptURLs := []string{}
 
 	if d.useSmartMenu {
 		smartMenuScriptURLs := []string{
