@@ -113,11 +113,11 @@ func (d Dashboard) ToHTML() string {
 	webpage.SetTitle(d.Title)
 	webpage.AddStyleURLs(styleURLs)
 	webpage.AddStyle("html,body{width:100%; height:100%;}")
-	webpage.AddStyle(d.styles())
 	webpage.AddStyle(styles(append(d.Styles, additionalStyles...)))
+	webpage.AddStyle(d.styles())
 	webpage.AddScriptURLs(scriptURLs)
-	webpage.AddScript(d.scripts())
 	webpage.AddScript(scripts(d.Scripts))
+	webpage.AddScript(d.scripts())
 	webpage.SetFavicon(favicon())
 	if d.RedirectUrl != "" && d.RedirectTime != "" {
 		webpage.Head.AddChild(hb.NewMeta().Attr("http-equiv", "refresh").Attr("content", d.RedirectTime+"; url = "+d.RedirectUrl))
