@@ -4,15 +4,13 @@ import (
 	"strings"
 
 	"github.com/gouniverse/hb"
+	"github.com/gouniverse/uncdn"
 )
 
 func scripts(scriptsArray []string) string {
 	requiredScripts := []string{
-		// templates.Jquery360(),
-		// templates.BootstrapJs513(),
-		// templates.VueJs3(),
-		// templates.WebJs260(),
-		// templates.SharedJs(),
+		uncdn.Jquery360(),
+		uncdn.BootstrapCss521(),
 	}
 
 	scriptsArray = append(requiredScripts, scriptsArray...)
