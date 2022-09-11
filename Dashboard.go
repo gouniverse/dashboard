@@ -4,6 +4,7 @@ import (
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/icons"
+	"github.com/gouniverse/uncdn"
 	"github.com/gouniverse/utils"
 )
 
@@ -76,14 +77,23 @@ func (d Dashboard) ToHTML() string {
 		cdn.BootstrapIconsCss191(),
 	}
 
+	additionalStyles := []string{}
+
 	if d.useSmartMenu {
+		// smartMenuStyleURLs := []string{
+		// 	"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/css/sm-core-css.css",
+		// 	"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/css/sm-simple/sm-simple.min.css",
+		// 	"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/css/sm-blue/sm-blue.min.css",
+		// 	"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/addons/bootstrap-4/jquery.smartmenus.bootstrap-4.css",
+		// }
+		// styleURLs = append(styleURLs, smartMenuStyleURLs...)
 		smartMenuStyleURLs := []string{
-			"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/css/sm-core-css.css",
-			"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/css/sm-simple/sm-simple.min.css",
-			"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/css/sm-blue/sm-blue.min.css",
-			"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/addons/bootstrap-4/jquery.smartmenus.bootstrap-4.css",
+			uncdn.JquerySmartMenusCss110(),
+			uncdn.JquerySmartMenusCssSimpleTheme110(),
+			uncdn.JquerySmartMenusCssBlueTheme110(),
+			uncdn.JquerySmartMenusCssBootstrap4AddOn110(),
 		}
-		styleURLs = append(styleURLs, smartMenuStyleURLs...)
+		additionalStyles = append(additionalStyles, smartMenuStyleURLs...)
 	}
 
 	styleURLs = append(styleURLs, d.StyleURLs...)
@@ -104,7 +114,7 @@ func (d Dashboard) ToHTML() string {
 	webpage.AddStyleURLs(styleURLs)
 	webpage.AddStyle("html,body{width:100%; height:100%;}")
 	webpage.AddStyle(d.styles())
-	webpage.AddStyle(styles(d.Styles))
+	webpage.AddStyle(styles(append(d.Styles, additionalStyles...)))
 	webpage.AddScriptURLs(scriptURLs)
 	webpage.AddScript(d.scripts())
 	webpage.AddScript(scripts(d.Scripts))

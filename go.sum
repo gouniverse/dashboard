@@ -16,6 +16,10 @@ github.com/gouniverse/icons v1.3.0 h1:GzKzjfxDxSdJt7qFv3Qb2vr0O3NgfVBDmH7TJy+X3t
 github.com/gouniverse/icons v1.3.0/go.mod h1:s/8uu1UY8LL9e8hfJONQBTI0np9zG6FMqq2gbENqoZU=
 github.com/gouniverse/uncdn v0.4.0 h1:QgFwY7QMI+OFz8RSiZ8VjJN71HAnKbgakkSJdaKsjmI=
 github.com/gouniverse/uncdn v0.4.0/go.mod h1:ipvItAUbddR3KHefw/cwClCT3T4T/c9BPRu45pfIvME=
+github.com/gouniverse/uncdn v0.5.0 h1:5Z5yej4rMf3ipMlAcOE6QYQ3wGUhreUExvveGukm/Vw=
+github.com/gouniverse/uncdn v0.5.0/go.mod h1:ipvItAUbddR3KHefw/cwClCT3T4T/c9BPRu45pfIvME=
+github.com/gouniverse/uncdn v0.5.1 h1:YiiJZzA6jdIoqfNdeBUINbMrtbgBBGGzsFaUEkbaj+0=
+github.com/gouniverse/uncdn v0.5.1/go.mod h1:ipvItAUbddR3KHefw/cwClCT3T4T/c9BPRu45pfIvME=
 github.com/gouniverse/utils v1.24.0/go.mod h1:xVK1uLXdTSoscCAFdOdYDNacZtmfVIh50bF/+heSt7M=
 github.com/gouniverse/utils v1.25.0 h1:faQcHQzRu2eXk9G/MJCdNGJXIJdaIkSrjR4Ebbwj7LQ=
 github.com/gouniverse/utils v1.25.0/go.mod h1:xVK1uLXdTSoscCAFdOdYDNacZtmfVIh50bF/+heSt7M=
