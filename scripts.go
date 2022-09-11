@@ -10,7 +10,7 @@ import (
 func scripts(scriptsArray []string) string {
 	requiredScripts := []string{
 		uncdn.Jquery360(),
-		uncdn.BootstrapCss521(),
+		uncdn.BootstrapJs521(),
 	}
 
 	scriptsArray = append(requiredScripts, scriptsArray...)
