@@ -141,22 +141,22 @@ func buildSubmenuItem(menuItem MenuItem, index int) *hb.Tag {
 		url = "#" + submenuId
 	}
 
-	a := hb.NewHyperlink().Attr("class", "nav-link px-0")
+	a := hb.NewHyperlink().Class("nav-link px-0")
 	if icon != "" {
-		a.AddChild(hb.NewSpan().Attr("class", "icon").Attr("style", "margin-right: 5px;"))
+		a.Child(hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(icon))
 	} else {
-		a.AddChild(hb.NewHTML(`
+		a.Child(hb.NewHTML(`
 		    <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
 		        <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
 		    </svg>
 		`))
 	}
-	a.AddChild(hb.NewSpan().Attr("class", "d-inline").HTML(title))
+	a.Child(hb.NewSpan().Class("d-inline").HTML(title))
 	a.Attr("href", url)
 	if hasChildren {
 		a.Attr("data-bs-toggle", "collapse")
 	}
-	li := hb.NewLI().Attr("class", "w-100").AddChild(a)
+	li := hb.NewLI().Class("w-100").Child(a)
 	return li
 }
 
