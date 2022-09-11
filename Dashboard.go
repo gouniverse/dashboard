@@ -172,15 +172,14 @@ func buildMenuItem(menuItem MenuItem, index int) *hb.Tag {
 	icon := menuItem.Icon
 	children := menuItem.Children
 	hasChildren := len(children) > 0
-	// menuId := "menu_" + utils.ToString(index)
 	submenuId := "submenu_" + utils.ToString(index)
 	if hasChildren {
 		url = "#" + submenuId
 	}
 
-	a := hb.NewHyperlink().Attr("class", "nav-link align-middle px-0")
+	a := hb.NewHyperlink().Class("nav-link align-middle px-0")
 	if icon != "" {
-		a.AddChild(hb.NewSpan().Attr("class", "icon").Attr("style", "margin-right: 5px;"))
+		a.AddChild(hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(icon))
 	}
 	a.HTML(title)
 	a.Attr("href", url)
@@ -193,16 +192,16 @@ func buildMenuItem(menuItem MenuItem, index int) *hb.Tag {
 			<path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
 			</svg>
 		</b>`
-		a.AddChild(hb.NewHTML(html))
+		a.Child(hb.NewHTML(html))
 	}
 
 	li := hb.NewLI().Attr("class", "nav-item").AddChild(a)
 
 	if hasChildren {
 		ul := hb.NewUL().
-			Attr("id", submenuId).
-			Attr("data-bs-parent", "#menu").
-			Attr("class", "collapse hide nav flex-column ms-1")
+			ID(submenuId).
+			Class("collapse hide nav flex-column ms-1").
+			Attr("data-bs-parent", "#menu")
 		for childIndex, childMenuItem := range children {
 			childItem := buildSubmenuItem(childMenuItem, childIndex)
 			ul.AddChild(childItem)
@@ -213,18 +212,18 @@ func buildMenuItem(menuItem MenuItem, index int) *hb.Tag {
 	return li
 }
 
-func (d Dashboard) smartMenuBuild([]MenuItem) *hb.Tag {
-	items := []*hb.Tag{}
+// func (d Dashboard) smartMenuBuild([]MenuItem) *hb.Tag {
+// 	items := []*hb.Tag{}
 
-	for index, menuItem := range d.menu {
-		li := buildMenuItem(menuItem, index)
-		items = append(items, li)
-	}
+// 	for index, menuItem := range d.menu {
+// 		li := buildMenuItem(menuItem, index)
+// 		items = append(items, li)
+// 	}
 
-	ul := hb.NewUL().ID("menu").AddChildren(items)
+// 	ul := hb.NewUL().ID("menu").AddChildren(items)
 
-	return ul
-}
+// 	return ul
+// }
 
 func (d Dashboard) smartMenu() string {
 	html := `
@@ -441,26 +440,26 @@ func (d Dashboard) dashboardLayoutMenu() string {
 	}
 
 	ul := hb.NewUL().
-		Attr("id", "menu").
-		Attr("class", "nav nav-pills flex-column mb-sm-auto mb-0 align-items-start").
-		AddChildren(items)
+		ID("menu").
+		Class("nav nav-pills flex-column mb-sm-auto mb-0 align-items-start").
+		Children(items)
 
 	return ul.ToHTML()
 }
 
 func (d Dashboard) center(content string) string {
 	dropdownUser := hb.NewDiv().Class("dropdown").
-		AddChild(hb.NewButton().Class("btn btn-secondary dropdown-toggle").
+		Child(hb.NewButton().Class("btn btn-secondary dropdown-toggle").
 			Attr("type", "button").
 			//Attr("id", "dropdownMenuButton1").
 			Attr("data-bs-toggle", "dropdown").
 			Attr("style", "background:#00A65A;").
 			//Attr("aria-expanded", "false").
 			HTML(d.user.FirstName + " " + d.user.LastName)).
-		AddChild(hb.NewUL().Class("dropdown-menu").
-			AddChild(hb.NewLI().
+		Child(hb.NewUL().Class("dropdown-menu").
+			Child(hb.NewLI().
 				//Attr("aria-labelledby", "dropdownMenuButton1").
-				AddChild(hb.NewHyperlink().Class("dropdown-item").HTML("Logout").Attr("href", "/auth/logout"))))
+				Child(hb.NewHyperlink().Class("dropdown-item").HTML("Logout").Attr("href", "/auth/logout"))))
 	buttonMenu := hb.NewButton().Class("btn btn-outline-dark").
 		Style("position:relative;width:30px;height:30px;border-radius:25px;padding:0px;").
 		OnClick("toggleSideMenu()").
@@ -513,18 +512,18 @@ func (d Dashboard) left() string {
 	return sideMenu.ToHTML()
 }
 
-func bottom() {
+// func bottom() {
 
-}
+// }
 
 func top() string {
 	html := ``
 	return html
 }
 
-func right() {
+// func right() {
 
-}
+// }
 
 func (d Dashboard) styles() string {
 	css := `
