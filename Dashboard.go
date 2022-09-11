@@ -4,7 +4,6 @@ import (
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/icons"
-	"github.com/gouniverse/uncdn"
 	"github.com/gouniverse/utils"
 )
 
