@@ -1,8 +1,10 @@
 package dashboard
 
 import (
+	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/icons"
+	"github.com/gouniverse/uncdn"
 	"github.com/gouniverse/utils"
 )
 
@@ -72,9 +74,9 @@ func (d Dashboard) SetMenu(menuItems []MenuItem) Dashboard {
 
 func (d Dashboard) ToHTML() string {
 	styleURLs := []string{
-		"//cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css",
-		"//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
-		"//cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css",
+		// "//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css",
+		cdn.BootstrapIconsCss191(),
+		uncdn.BootstrapCss521(),
 	}
 
 	if d.useSmartMenu {
@@ -90,8 +92,8 @@ func (d Dashboard) ToHTML() string {
 	styleURLs = append(styleURLs, d.StyleURLs...)
 
 	scriptURLs := []string{
-		"//code.jquery.com/jquery-1.11.0.min.js",
-		"//cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js",
+		uncdn.Jquery360(),
+		uncdn.BootstrapCss521(),
 	}
 
 	if d.useSmartMenu {
