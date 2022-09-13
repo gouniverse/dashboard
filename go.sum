@@ -20,6 +20,8 @@ github.com/gouniverse/uncdn v0.5.0 h1:5Z5yej4rMf3ipMlAcOE6QYQ3wGUhreUExvveGukm/V
 github.com/gouniverse/uncdn v0.5.0/go.mod h1:ipvItAUbddR3KHefw/cwClCT3T4T/c9BPRu45pfIvME=
 github.com/gouniverse/uncdn v0.5.1 h1:YiiJZzA6jdIoqfNdeBUINbMrtbgBBGGzsFaUEkbaj+0=
 github.com/gouniverse/uncdn v0.5.1/go.mod h1:ipvItAUbddR3KHefw/cwClCT3T4T/c9BPRu45pfIvME=
+github.com/gouniverse/uncdn v0.5.2 h1:7IF4YzHnaUv0zSIh1ryzoGZfsnafe4CY20ZCK8zjAoc=
+github.com/gouniverse/uncdn v0.5.2/go.mod h1:ipvItAUbddR3KHefw/cwClCT3T4T/c9BPRu45pfIvME=
 github.com/gouniverse/utils v1.24.0/go.mod h1:xVK1uLXdTSoscCAFdOdYDNacZtmfVIh50bF/+heSt7M=
 github.com/gouniverse/utils v1.25.0 h1:faQcHQzRu2eXk9G/MJCdNGJXIJdaIkSrjR4Ebbwj7LQ=
 github.com/gouniverse/utils v1.25.0/go.mod h1:xVK1uLXdTSoscCAFdOdYDNacZtmfVIh50bF/+heSt7M=

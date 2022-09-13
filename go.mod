@@ -6,7 +6,7 @@ require (
 	github.com/gouniverse/cdn v0.0.1
 	github.com/gouniverse/hb v1.42.0
 	github.com/gouniverse/icons v1.3.0
-	github.com/gouniverse/uncdn v0.5.1
+	github.com/gouniverse/uncdn v0.5.2
 	github.com/gouniverse/utils v1.27.0
 )
 

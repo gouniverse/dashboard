@@ -13,6 +13,8 @@ type Dashboard struct {
 	user         User
 	Title        string
 	Content      string
+	FaviconURL   string
+	LogoURL      string
 	Scripts      []string
 	ScriptURLs   []string
 	Styles       []string
@@ -108,6 +110,10 @@ func (d Dashboard) ToHTML() string {
 	}
 
 	scriptURLs = append(scriptURLs, d.ScriptURLs...)
+	faviconURL := d.FaviconURL
+	if faviconURL == "" {
+		faviconURL = favicon()
+	}
 
 	webpage := hb.NewWebpage()
 	webpage.SetTitle(d.Title)
@@ -118,7 +124,7 @@ func (d Dashboard) ToHTML() string {
 	webpage.AddScriptURLs(scriptURLs)
 	webpage.AddScript(scripts(d.Scripts))
 	webpage.AddScript(d.scripts())
-	webpage.SetFavicon(favicon())
+	webpage.SetFavicon(faviconURL)
 	if d.RedirectUrl != "" && d.RedirectTime != "" {
 		webpage.Head.AddChild(hb.NewMeta().Attr("http-equiv", "refresh").Attr("content", d.RedirectTime+"; url = "+d.RedirectUrl))
 	}
@@ -510,13 +516,20 @@ func (d Dashboard) left() string {
 		menu = d.dashboardLayoutMenu()
 	}
 
-	// <img src="https://placeholder.pics/svg/300/295BFF-71D1FF/F8FF34-2730FF/Logo" style="width:100%;margin:0px 10px 0px 0px;" />
+	var logo *hb.Tag
+	logoURL := d.LogoURL
+	if logoURL == "" {
+		logoURL = utils.ImgPlaceholderURL(120, 80, "Logo")
+		placeholderLogo := hb.NewImage().Attr("src", logoURL).Style("width:100%;margin:0px 10px 0px 0px;")
+		adminDiv := hb.NewDiv().HTML("ADMIN PANEL").Style("font-size:12px;text-align: center;")
+		logo = hb.NewDiv().Class("Logo").AddChild(placeholderLogo).AddChild(adminDiv)
+	} else {
+		logo = hb.NewImage().Attr("src", logoURL).Style("width:100%;margin:0px 10px 0px 0px;")
+	}
 
-	placeholderLogo := hb.NewImage().Attr("src", utils.ImgPlaceholderURL(120, 80, "Logo")).Style("width:100%;margin:0px 10px 0px 0px;")
-	adminDiv := hb.NewDiv().HTML("ADMIN PANEL").Style("font-size:12px;text-align: center;")
 	sideMenu := hb.NewDiv().ID("SideMenu").Class("p-4").Style("height:100%;width:200px;").
 		AddChildren([]*hb.Tag{
-			hb.NewDiv().Class("Logo").AddChild(placeholderLogo).AddChild(adminDiv),
+			logo,
 			hb.NewDiv().Class("Menu").HTML(menu),
 		})
 	return sideMenu.ToHTML()

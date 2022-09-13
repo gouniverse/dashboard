@@ -5,6 +5,8 @@ type Config struct {
 	User         User
 	Title        string
 	Content      string
+	FaviconURL   string
+	LogoURL      string
 	Scripts      []string
 	ScriptURLs   []string
 	Styles       []string
