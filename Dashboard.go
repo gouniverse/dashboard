@@ -155,9 +155,9 @@ func buildSubmenuItem(menuItem MenuItem, index int) *hb.Tag {
 		`))
 	}
 	link.Child(hb.NewSpan().Class("d-inline").HTML(title))
-	link.Attr("href", url)
+	link.Href(url)
 	if hasChildren {
-		link.Attr("data-bs-toggle", "collapse")
+		link.Data("bs-toggle", "collapse")
 	}
 
 	return hb.NewLI().
@@ -184,12 +184,12 @@ func buildMenuItem(menuItem MenuItem, index int) *hb.Tag {
 
 	link := hb.NewHyperlink().Class("nav-link align-middle px-0")
 	if icon != "" {
-		link.AddChild(hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(icon))
+		link.Child(hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(icon))
 	}
 	link.HTML(title)
 	link.Attr("href", url)
 	if hasChildren {
-		link.Attr("data-bs-toggle", "collapse")
+		link.Data("bs-toggle", "collapse")
 	}
 	if hasChildren {
 		html := `<b class="caret">
@@ -206,7 +206,7 @@ func buildMenuItem(menuItem MenuItem, index int) *hb.Tag {
 		ul := hb.NewUL().
 			ID(submenuId).
 			Class("collapse hide nav flex-column ms-1").
-			Attr("data-bs-parent", "#DashboardMenu")
+			Data("bs-parent", "#DashboardMenu")
 		for childIndex, childMenuItem := range children {
 			childItem := buildSubmenuItem(childMenuItem, childIndex)
 			ul.Child(childItem)
@@ -314,7 +314,7 @@ func (d Dashboard) menuOffcanvas() *hb.Tag {
 					hb.NewButton().
 						Class("btn-close btn-close-white").
 						Attr("type", "button").
-						Data("data-bs-dismiss", "offcanvas").
+						Data("bs-dismiss", "offcanvas").
 						Attr("aria-label", "Close"),
 				}),
 			hb.NewDiv().Class("offcanvas-body").
