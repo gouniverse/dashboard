@@ -1,18 +1,27 @@
 package dashboard
 
+import "net/http"
+
+type ThemeNameContextKey struct{}
+
+var THEME_COOKIE_KEY = "theme"
+
 type Config struct {
-	Menu         []MenuItem
-	User         User
-	Title        string
-	Content      string
-	FaviconURL   string
-	LogoURL      string
-	Scripts      []string
-	ScriptURLs   []string
-	Styles       []string
-	StyleURLs    []string
-	RedirectUrl  string
-	RedirectTime string
-	UseSmartMenu bool
-	UseMetisMenu bool
+	Content              string
+	FaviconURL           string
+	HTTPRequest          *http.Request
+	LogoURL              string
+	Menu                 []MenuItem
+	MenuType             string
+	RedirectTime         string
+	RedirectUrl          string
+	Scripts              []string
+	ScriptURLs           []string
+	Styles               []string
+	StyleURLs            []string
+	ThemeName            string
+	ThemeHandlerUrl      string
+	Title                string
+	UncdnHandlerEndpoint string
+	User                 User
 }

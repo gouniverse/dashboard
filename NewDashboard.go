@@ -1,6 +1,16 @@
 package dashboard
 
 func NewDashboard(config Config) Dashboard {
+	if config.MenuType == "" {
+		config.MenuType = MENU_TYPE_OFFCANVAS // default
+	}
+
+	if config.ThemeName == "" && config.HTTPRequest != nil {
+		config.ThemeName = ThemeNameRetrieveFromCookie(config.HTTPRequest)
+	}
+
+	config.ThemeName = themeNameVerifyAndFix(config.ThemeName)
+
 	dashboard := Dashboard{}
 	dashboard.Title = config.Title
 	dashboard.Content = config.Content
@@ -9,10 +19,13 @@ func NewDashboard(config Config) Dashboard {
 	dashboard.Scripts = config.Scripts
 	dashboard.ScriptURLs = config.ScriptURLs
 	dashboard.Styles = config.Styles
+	dashboard.MenuType = config.MenuType
 	dashboard.RedirectUrl = config.RedirectUrl
 	dashboard.RedirectTime = config.RedirectTime
+	dashboard.ThemeHandlerUrl = config.ThemeHandlerUrl
+	dashboard.ThemeName = config.ThemeName
+	dashboard.UncdnHandlerEndpoint = config.UncdnHandlerEndpoint
 	dashboard.menu = config.Menu
-	dashboard.useSmartMenu = config.UseSmartMenu
-	dashboard.useMetisMenu = config.UseMetisMenu
+	dashboard.user = config.User
 	return dashboard
 }

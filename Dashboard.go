@@ -1,28 +1,36 @@
 package dashboard
 
 import (
+	"strings"
+
+	"github.com/gouniverse/bs"
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/icons"
-	"github.com/gouniverse/uncdn"
 	"github.com/gouniverse/utils"
+	"github.com/samber/lo"
 )
 
+const MENU_TYPE_MODAL = "modal"
+const MENU_TYPE_OFFCANVAS = "offcanvas"
+
 type Dashboard struct {
-	menu         []MenuItem
-	user         User
-	Title        string
-	Content      string
-	FaviconURL   string
-	LogoURL      string
-	Scripts      []string
-	ScriptURLs   []string
-	Styles       []string
-	StyleURLs    []string
-	RedirectUrl  string
-	RedirectTime string
-	useMetisMenu bool // TODO
-	useSmartMenu bool
+	menu                 []MenuItem
+	user                 User
+	MenuType             string
+	Title                string
+	Content              string
+	FaviconURL           string
+	LogoURL              string
+	Scripts              []string
+	ScriptURLs           []string
+	Styles               []string
+	StyleURLs            []string
+	RedirectUrl          string
+	RedirectTime         string
+	ThemeHandlerUrl      string
+	ThemeName            string
+	UncdnHandlerEndpoint string
 }
 
 type MenuItem struct {
@@ -42,12 +50,9 @@ type User struct {
 func (d Dashboard) layout() string {
 	content := d.Content
 	layout := hb.NewBorderLayout()
-	top := top()
-	if top != "" {
-		layout.AddTop(hb.NewHTML(top), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_MIDDLE)
-	}
-	layout.AddLeft(hb.NewHTML(d.left()), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_TOP)
-	//layout.AddBottom(hb.NewHTML("BOTTOM"), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_MIDDLE)
+	layout.AddTop(hb.NewHTML(d.top()), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_MIDDLE)
+	// layout.AddLeft(hb.NewHTML(d.left()), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_TOP)
+	// layout.AddBottom(hb.NewHTML("BOTTOM"), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_MIDDLE)
 	// layout.AddRight(hb.NewHTML("RIGHT"), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_TOP)
 	layout.AddCenter(hb.NewHTML(d.center(content)), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_TOP)
 	return layout.ToHTML()
@@ -81,33 +86,9 @@ func (d Dashboard) ToHTML() string {
 
 	additionalStyles := []string{}
 
-	if d.useSmartMenu {
-		// smartMenuStyleURLs := []string{
-		// 	"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/css/sm-core-css.css",
-		// 	"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/css/sm-simple/sm-simple.min.css",
-		// 	"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/css/sm-blue/sm-blue.min.css",
-		// 	"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/addons/bootstrap-4/jquery.smartmenus.bootstrap-4.css",
-		// }
-		// styleURLs = append(styleURLs, smartMenuStyleURLs...)
-		smartMenuStyleURLs := []string{
-			uncdn.JquerySmartMenusCss110(),
-			uncdn.JquerySmartMenusCssSimpleTheme110(),
-			uncdn.JquerySmartMenusCssBlueTheme110(),
-			uncdn.JquerySmartMenusCssBootstrap4AddOn110(),
-		}
-		additionalStyles = append(additionalStyles, smartMenuStyleURLs...)
-	}
-
 	styleURLs = append(styleURLs, d.StyleURLs...)
 
 	scriptURLs := []string{}
-
-	if d.useSmartMenu {
-		smartMenuScriptURLs := []string{
-			"https://cdnjs.cloudflare.com/ajax/libs/jquery.smartmenus/1.1.0/jquery.smartmenus.min.js",
-		}
-		scriptURLs = append(scriptURLs, smartMenuScriptURLs...)
-	}
 
 	scriptURLs = append(scriptURLs, d.ScriptURLs...)
 	faviconURL := d.FaviconURL
@@ -117,6 +98,7 @@ func (d Dashboard) ToHTML() string {
 
 	webpage := hb.NewWebpage()
 	webpage.SetTitle(d.Title)
+	webpage.AddStyleURLs(d.themeStyleURLs(d.ThemeName))
 	webpage.AddStyleURLs(styleURLs)
 	webpage.AddStyle("html,body{width:100%; height:100%;}")
 	webpage.AddStyle(styles(append(d.Styles, additionalStyles...)))
@@ -129,7 +111,12 @@ func (d Dashboard) ToHTML() string {
 		webpage.Head.AddChild(hb.NewMeta().Attr("http-equiv", "refresh").Attr("content", d.RedirectTime+"; url = "+d.RedirectUrl))
 	}
 
-	webpage.AddChild(hb.NewHTML(d.layout()))
+	menu := d.menuOffcanvas().ToHTML()
+	if d.MenuType == MENU_TYPE_MODAL {
+		menu += d.menuModal().ToHTML()
+	}
+
+	webpage.AddChild(hb.NewHTML(d.layout() + menu))
 
 	return webpage.ToHTML()
 }
@@ -157,23 +144,25 @@ func buildSubmenuItem(menuItem MenuItem, index int) *hb.Tag {
 		url = "#" + submenuId
 	}
 
-	a := hb.NewHyperlink().Class("nav-link px-0")
+	link := hb.NewHyperlink().Class("nav-link px-0")
 	if icon != "" {
-		a.Child(hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(icon))
+		link.Child(hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(icon))
 	} else {
-		a.Child(hb.NewHTML(`
+		link.Child(hb.NewHTML(`
 		    <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
 		        <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
 		    </svg>
 		`))
 	}
-	a.Child(hb.NewSpan().Class("d-inline").HTML(title))
-	a.Attr("href", url)
+	link.Child(hb.NewSpan().Class("d-inline").HTML(title))
+	link.Attr("href", url)
 	if hasChildren {
-		a.Attr("data-bs-toggle", "collapse")
+		link.Attr("data-bs-toggle", "collapse")
 	}
-	li := hb.NewLI().Class("w-100").Child(a)
-	return li
+
+	return hb.NewLI().
+		Class("w-100").
+		Child(link)
 }
 
 func buildMenuItem(menuItem MenuItem, index int) *hb.Tag {
@@ -193,14 +182,14 @@ func buildMenuItem(menuItem MenuItem, index int) *hb.Tag {
 		url = "#" + submenuId
 	}
 
-	a := hb.NewHyperlink().Class("nav-link align-middle px-0")
+	link := hb.NewHyperlink().Class("nav-link align-middle px-0")
 	if icon != "" {
-		a.AddChild(hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(icon))
+		link.AddChild(hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(icon))
 	}
-	a.HTML(title)
-	a.Attr("href", url)
+	link.HTML(title)
+	link.Attr("href", url)
 	if hasChildren {
-		a.Attr("data-bs-toggle", "collapse")
+		link.Attr("data-bs-toggle", "collapse")
 	}
 	if hasChildren {
 		html := `<b class="caret">
@@ -208,246 +197,26 @@ func buildMenuItem(menuItem MenuItem, index int) *hb.Tag {
 			<path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
 			</svg>
 		</b>`
-		a.Child(hb.NewHTML(html))
+		link.Child(hb.NewHTML(html))
 	}
 
-	li := hb.NewLI().Attr("class", "nav-item").AddChild(a)
+	li := hb.NewLI().Class("nav-item").Child(link)
 
 	if hasChildren {
 		ul := hb.NewUL().
 			ID(submenuId).
 			Class("collapse hide nav flex-column ms-1").
-			Attr("data-bs-parent", "#menu")
+			Attr("data-bs-parent", "#DashboardMenu")
 		for childIndex, childMenuItem := range children {
 			childItem := buildSubmenuItem(childMenuItem, childIndex)
-			ul.AddChild(childItem)
+			ul.Child(childItem)
 		}
-		li.AddChild(ul)
+		li.Child(ul)
 	}
 
 	return li
 }
 
-// func (d Dashboard) smartMenuBuild([]MenuItem) *hb.Tag {
-// 	items := []*hb.Tag{}
-
-// 	for index, menuItem := range d.menu {
-// 		li := buildMenuItem(menuItem, index)
-// 		items = append(items, li)
-// 	}
-
-// 	ul := hb.NewUL().ID("menu").AddChildren(items)
-
-// 	return ul
-// }
-
-func (d Dashboard) smartMenu() string {
-	html := `
-	<nav role="navigation">
-	<!-- Sample menu definition -->
-	<ul id="main-menu" class="sm sm-blue sm-vertical">
-	  <li><a href="http://www.smartmenus.org/">Home</a></li>
-	  <li><a href="#">Long sub 1</a>
-		<ul>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">A pretty long text to test the default subMenusMaxWidth:20em setting for the sub menus</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">A pretty long text to test the default subMenusMaxWidth:20em setting for the sub menus</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">A pretty long text to test the default subMenusMaxWidth:20em setting for the sub menus</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">A pretty long text to test the default subMenusMaxWidth:20em setting for the sub menus</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">A pretty long text to test the default subMenusMaxWidth:20em setting for the sub menus</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		</ul>
-	  </li>
-	  <li><a href="#">Long sub 2</a>
-		<ul>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">A pretty long text to test the default subMenusMaxWidth:20em setting for the sub menus</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">A pretty long text to test the default subMenusMaxWidth:20em setting for the sub menus</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">A pretty long text to test the default subMenusMaxWidth:20em setting for the sub menus</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">A pretty long text to test the default subMenusMaxWidth:20em setting for the sub menus</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">A pretty long text to test the default subMenusMaxWidth:20em setting for the sub menus</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		</ul>
-	  </li>
-	  <li><a href="#">Sub 3</a>
-		<ul>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">Dummy item</a></li>
-		  <li><a href="#">more...</a>
-			<ul>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">A pretty long text to test the default subMenusMaxWidth:20em setting for the sub menus</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">A pretty long text to test the default subMenusMaxWidth:20em setting for the sub menus</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">A pretty long text to test the default subMenusMaxWidth:20em setting for the sub menus</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">A pretty long text to test the default subMenusMaxWidth:20em setting for the sub menus</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">A pretty long text to test the default subMenusMaxWidth:20em setting for the sub menus</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			  <li><a href="#">Dummy item</a></li>
-			</ul>
-		  </li>
-		</ul>
-	  </li>
-	</ul>
-  </nav>
-	`
-	return html
-}
 func (d Dashboard) dashboardLayoutMenu() string {
 	items := []*hb.Tag{}
 	for index, menuItem := range d.menu {
@@ -456,38 +225,152 @@ func (d Dashboard) dashboardLayoutMenu() string {
 	}
 
 	ul := hb.NewUL().
-		ID("menu").
-		Class("nav nav-pills flex-column mb-sm-auto mb-0 align-items-start").
+		ID("DashboardMenu").
+		// Class("nav nav-pills flex-column mb-sm-auto mb-0 align-items-start").
+		Class("navbar-nav justify-content-end flex-grow-1 pe-3").
 		Children(items)
 
 	return ul.ToHTML()
 }
 
-func (d Dashboard) center(content string) string {
+func (d Dashboard) top() string {
 	dropdownUser := hb.NewDiv().Class("dropdown").
-		Child(hb.NewButton().Class("btn btn-secondary dropdown-toggle").
-			Attr("type", "button").
-			//Attr("id", "dropdownMenuButton1").
-			Attr("data-bs-toggle", "dropdown").
-			Attr("style", "background:#00A65A;").
-			//Attr("aria-expanded", "false").
-			HTML(d.user.FirstName + " " + d.user.LastName)).
-		Child(hb.NewUL().Class("dropdown-menu").
-			Child(hb.NewLI().
-				//Attr("aria-labelledby", "dropdownMenuButton1").
-				Child(hb.NewHyperlink().Class("dropdown-item").HTML("Logout").Attr("href", "/auth/logout"))))
-	buttonMenu := hb.NewButton().Class("btn btn-outline-dark").
-		Style("position:relative;width:30px;height:30px;border-radius:25px;padding:0px;").
-		OnClick("toggleSideMenu()").
-		AddChild(icons.Icon("bi-list", 16, 16, "").Style("margin-top:-4px;"))
-	toolbar := hb.NewDiv().ID("Toolbar").Class("p-4").Style("background-color: #fff;z-index: 3;box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);transition: all .2s ease;").
-		AddChild(buttonMenu).
-		AddChild(hb.NewDiv().Class("float-end").AddChild(dropdownUser))
+		Children([]*hb.Tag{
+			hb.NewButton().
+				ID("ButtonUser").
+				Class("btn btn-secondary dropdown-toggle").
+				Attr("type", "button").
+				Attr("data-bs-toggle", "dropdown").
+				HTML(d.user.FirstName + " " + d.user.LastName),
+			hb.NewUL().Class("dropdown-menu").
+				Children([]*hb.Tag{
+					hb.NewLI().Children([]*hb.Tag{
+						hb.NewHyperlink().Class("dropdown-item").HTML("Logout").Attr("href", "/auth/logout"),
+					}),
+				}),
+		})
 
-	contentHolder := hb.NewDiv().Class("shadow bg-white p-3 m-3").HTML(content)
-	html := toolbar.ToHTML() + contentHolder.ToHTML()
+	projectsDropdown := hb.NewDiv().Class("dropdown").
+		Children([]*hb.Tag{
+			hb.NewButton().
+				ID("ButtonUser").
+				Class("btn btn-secondary dropdown-toggle").
+				Attr("type", "button").
+				Attr("data-bs-toggle", "dropdown").
+				HTML("Project: "),
+			hb.NewUL().Class("dropdown-menu").
+				Children([]*hb.Tag{
+					hb.NewLI().Children([]*hb.Tag{
+						hb.NewHyperlink().
+							Class("dropdown-item").
+							HTML("New Project").
+							Attr("href", "/user/projects/create"),
+					}),
+				}),
+		})
+
+	buttonMenuToggle := hb.NewButton().Class("btn btn-secondary").
+		Attr("data-bs-toggle", "modal").
+		Attr("data-bs-target", "#ModalDashboardMenu").
+		Children([]*hb.Tag{
+			icons.Icon("bi-list", 16, 16, "").Style("margin-top:-4px;margin-right:5px;"),
+			hb.NewSpan().HTML("Menu"),
+		})
+
+	buttonOffcanvasToggle := hb.NewButton().
+		Class("btn btn-secondary"). // outline-dark
+		Attr("data-bs-toggle", "offcanvas").
+		Attr("data-bs-target", "#OffcanvasMenu").
+		Children([]*hb.Tag{
+			icons.Icon("bi-list", 16, 16, "").Style("margin-top:-4px;margin-right:5px;"),
+			hb.NewSpan().HTML("Menu"),
+		})
+
+	menu := buttonOffcanvasToggle
+	if d.MenuType == MENU_TYPE_MODAL {
+		menu = buttonMenuToggle
+	}
+
+	toolbar := hb.NewNav().
+		ID("Toolbar").
+		Class("navbar navbar-dark bg-dark").
+		Style("background-color: #fff;z-index: 3;box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);transition: all .2s ease;").
+		Children([]*hb.Tag{
+			menu,
+			projectsDropdown,
+			hb.NewDiv().Class("float-end").Child(d.themeButton(d.ThemeName)),
+			hb.NewDiv().Class("float-end").Child(dropdownUser),
+		})
+
+	return toolbar.ToHTML()
+}
+
+func (d Dashboard) center(content string) string {
+	contentHolder := hb.NewDiv().Class("shadow p-3 m-3").HTML(content)
+	html := contentHolder.ToHTML()
 	return html
 }
+
+func (d Dashboard) menuOffcanvas() *hb.Tag {
+	offcanvasMenu := hb.NewDiv().
+		ID("OffcanvasMenu").
+		Class("offcanvas offcanvas-start text-bg-dark").
+		Attr("tabindex", "-1").
+		Children([]*hb.Tag{
+			hb.NewDiv().Class("offcanvas-header").Children([]*hb.Tag{
+				hb.NewHeading5().
+					Class("offcanvas-title").
+					HTML("Menu"),
+				hb.NewButton().
+					Class("btn-close btn-close-white").
+					Attr("type", "button").
+					Attr("data-bs-dismiss", "offcanvas").
+					Attr("aria-label", "Close"),
+			}),
+			hb.NewDiv().Class("offcanvas-body").Children([]*hb.Tag{
+				hb.NewHTML(d.dashboardLayoutMenu()),
+			}),
+		})
+
+	return offcanvasMenu
+}
+
+func (d Dashboard) menuModal() *hb.Tag {
+	modalHeader := hb.NewDiv().Class("modal-header").
+		Children([]*hb.Tag{
+			hb.NewHeading5().HTML("Menu").Class("modal-title"),
+			hb.NewButton().Attrs(map[string]string{
+				"type":            "button",
+				"class":           "btn-close",
+				"data-bs-dismiss": "modal",
+				"aria-label":      "Close",
+			}),
+		})
+
+	modalBody := hb.NewDiv().Class("modal-body").Children([]*hb.Tag{
+		hb.NewHTML(d.dashboardLayoutMenu()),
+	})
+
+	modalFooter := hb.NewDiv().Class("modal-footer").Children([]*hb.Tag{
+		hb.NewButton().
+			HTML("Close").
+			Class("btn btn-secondary w-100").
+			Attr("data-bs-dismiss", "modal"),
+	})
+
+	modal := hb.NewDiv().ID("ModalDashboardMenu").Class("modal fade").AddChildren([]*hb.Tag{
+		hb.NewDiv().Class("modal-dialog modal-lg").AddChildren([]*hb.Tag{
+			hb.NewDiv().Class("modal-content").AddChildren([]*hb.Tag{
+				modalHeader,
+				modalBody,
+				modalFooter,
+			}),
+		}),
+	})
+
+	return modal
+}
+
 func (d Dashboard) left() string {
 
 	// 	personDropdownUseIfneeded := `
@@ -510,11 +393,7 @@ func (d Dashboard) left() string {
 
 	menu := ""
 
-	if d.useSmartMenu {
-		menu = d.smartMenu()
-	} else {
-		menu = d.dashboardLayoutMenu()
-	}
+	menu = d.dashboardLayoutMenu()
 
 	var logo *hb.Tag
 	logoURL := d.LogoURL
@@ -535,113 +414,162 @@ func (d Dashboard) left() string {
 	return sideMenu.ToHTML()
 }
 
-// func bottom() {
-
-// }
-
-func top() string {
-	html := ``
-	return html
-}
-
-// func right() {
-
-// }
-
 func (d Dashboard) styles() string {
+	// @media (min-width: 1200px) {
+	// 	.span12, .container {
+	// 		width: 1170px;
+	// 	}
+	// }
+	// #SideMenu{
+	// 	background: #343957;
+	// }
+	// #SideMenu a {
+	// 	color: #fff;
+	// }
+	// #SideMenu div.Logo {
+	// 	border:2px solid #999;
+	// 	color:#666;
+	// 	background: #eee;
+	// }
+	// #SideMenu div.Menu {
+	// 	margin: 30px 0px 30px 0px;
+	// 	padding: 10px 10px 10px 10px;
+	// 	background: #444;
+	// 	background-image: linear-gradient(to right, #444 , #555, #444);
+	// 	border-radius: 5px;
+	// }
+	// #Toolbar{
+	// 	background: #fff;
+	// }
+
+	// #ModalDashboardMenu .nav-item {
+	// 	border: 1px solid #999;
+	// 	background: #eee;
+	// 	width: 100%;
+	// 	margin: 10px 0px;
+	// 	border-radius: 10px;
+	// 	padding: 10px;
+	// }
+
+	// #ModalDashboardMenu .nav-item:hover {
+	// 	background: cornsilk;
+	// }
+
+	// .well {
+	// 	min-height: 20px;
+	// 	padding: 19px;
+	// 	margin-bottom: 20px;
+	// 	background-color: #fafafa;
+	// 	border: 1px solid #e8e8e8;
+	// 	border-radius: 0;
+	// 	box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
+	// }
+	// html, body{
+	// 	height: 100%;
+	// 	background: #eee;
+	// }
 	css := `
 html, body{
 	height: 100%;
-	background: #eee;
-}
-@media (min-width: 1200px) {
-	.span12, .container {
-		width: 1170px;
-	}
-}
-#SideMenu{
-	background: #343957;
-}
-#SideMenu a {
-	color: #fff;
-}
-#SideMenu div.Logo {
-	border:2px solid #999;
-	color:#666;
-	background: #eee;
-}
-#SideMenu div.Menu {
-	margin: 30px 0px 30px 0px;
-	padding: 10px 10px 10px 10px;
-	background: #444;
-	background-image: linear-gradient(to right, #444 , #555, #444);
-	border-radius: 5px;
-}
-#Toolbar{
-	background: #fff;
-}
-.well {
-	min-height: 20px;
-	padding: 19px;
-	margin-bottom: 20px;
-	background-color: #fafafa;
-	border: 1px solid #e8e8e8;
-	border-radius: 0;
-	box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
 }
 	`
 	return css
 }
 
 func (d Dashboard) scripts() string {
-
-	toggleSidemenu := `function toggleSideMenu() { $("#SideMenu").toggle(); }`
-
-	js := `
-/**
-* One of xs, sm, md, lg, xl. xxl
-* @returns {String}
-*/
-function checkMode() {
-	var width = $(window).width();
-	if (width < 576) {
-		return 'xs';
-	} else if (width < 768) {
-		return 'sm';
-	} else if (width < 992) {
-		return 'md';
-	} else if (width < 1200) {
-		return 'lg';
-	} else if (width < 1400) {
-		return 'xl';
-	} else {
-		return 'xxl';
-	}
-}
-function onResized() {
-	var mode = checkMode();
-	if (mode == "xs") {
-		$("#SideMenu").hide();
-	}
-}
-$(window).on('resize', function () {
-	onResized()
-});
-
-$(() => {
-	onResized();
-});
-	`
-
-	js += toggleSidemenu
-	if d.useSmartMenu {
-		js += `$(function () { $('#main-menu').smartmenus(); });`
-	}
-
+	js := ``
 	return js
 }
 
 func favicon() string {
 	favicon := "data:image/x-icon;base64,AAABAAEAEBAQAAAAAAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAzMzMAAAAmQBmZpkA////AJmZzAAzM5kAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAzMzMzMxQAA1YiIiIiUQADViIiIiZERANTIiIiJBVRRTMiIiJBNmJFNSIiJEMmZlRlIiJlYiJmVDUiImIiIiIUMzImMiIiJRFGUiZiImJkQEMzIiImFlEABDMyIiZiVAAEFTNiI2ZEAABBFTJmJRAAAABBRjQjQAAAAABFEBFACABwAAAAcAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAEAAMABAADAAQAA4AMAAPgDAAD+IwAA"
 	return favicon
+}
+
+func (d Dashboard) themeButton(themeName string) *hb.Tag {
+	isDark := lo.Contains(lo.Keys(themesDark), themeName)
+	lightDropdownItems := []*hb.Tag{}
+	lo.ForEach(lo.Keys(themesLight), func(theme string, index int) {
+		name := themesLight[theme]
+		active := lo.Ternary(themeName == theme, " active", "")
+		url := lo.Ternary(strings.Contains(d.ThemeHandlerUrl, "?"), d.ThemeHandlerUrl+"&theme="+theme, d.ThemeHandlerUrl+"?theme="+theme)
+
+		lightDropdownItems = append(lightDropdownItems, hb.NewLI().Children([]*hb.Tag{
+			hb.NewHyperlink().
+				Class("dropdown-item"+active).
+				HTML("(Light) "+name).
+				Attr("href", url).
+				Attr("ref", "nofollow"),
+		}))
+	})
+
+	darkDropdownItems := []*hb.Tag{}
+	lo.ForEach(lo.Keys(themesDark), func(theme string, index int) {
+		name := themesDark[theme]
+		active := lo.Ternary(themeName == theme, " active", "")
+		url := lo.Ternary(strings.Contains(d.ThemeHandlerUrl, "?"), d.ThemeHandlerUrl+"&theme="+theme, d.ThemeHandlerUrl+"?theme="+theme)
+
+		darkDropdownItems = append(darkDropdownItems, hb.NewLI().Children([]*hb.Tag{
+			hb.NewHyperlink().
+				Class("dropdown-item"+active).
+				HTML("(Dark) "+name).
+				Attr("href", url).
+				Attr("ref", "nofollow"),
+		}))
+	})
+	return hb.NewDiv().Class("dropdown").Children([]*hb.Tag{
+		bs.Button().
+			ID("buttonTheme").
+			Class("btn-secondary dropdown-toggle").
+			Attr("data-bs-toggle", "dropdown").
+			Children([]*hb.Tag{
+				lo.Ternary(isDark, icons.Icon("bi-brightness-high-fill", 16, 16, "#fff"), icons.Icon("bi-brightness-high-fill", 16, 16, "#333")),
+			}),
+		hb.NewUL().Class("dropdown-menu dropdown-menu-dark").
+			Children(lightDropdownItems).
+			Children([]*hb.Tag{
+				hb.NewLI().Children([]*hb.Tag{
+					hb.NewHR().Class("dropdown-divider"),
+				}),
+			}).
+			Children(darkDropdownItems),
+	})
+}
+
+func (d Dashboard) themeStyleURLs(theme string) []string {
+	themeStyle := lo.
+		If(theme == "cerulean", "bs523"+theme).
+		ElseIf(theme == "cosmo", "bs523"+theme).
+		ElseIf(theme == "cyborg", "bs523"+theme).
+		ElseIf(theme == "darkly", "bs523"+theme).
+		ElseIf(theme == "flatly", "bs523"+theme).
+		ElseIf(theme == "journal", "bs523"+theme).
+		ElseIf(theme == "litera", "bs523"+theme).
+		ElseIf(theme == "lumen", "bs523"+theme).
+		ElseIf(theme == "lux", "bs523"+theme).
+		ElseIf(theme == "materia", "bs523"+theme).
+		ElseIf(theme == "minty", "bs523"+theme).
+		ElseIf(theme == "morph", "bs523"+theme).
+		ElseIf(theme == "pulse", "bs523"+theme).
+		ElseIf(theme == "quartz", "bs523"+theme).
+		ElseIf(theme == "sandstone", "bs523"+theme).
+		ElseIf(theme == "simplex", "bs523"+theme).
+		ElseIf(theme == "sketchy", "bs523"+theme).
+		ElseIf(theme == "slate", "bs523"+theme).
+		ElseIf(theme == "solar", "bs523"+theme).
+		ElseIf(theme == "spacelab", "bs523"+theme).
+		ElseIf(theme == "superhero", "bs523"+theme).
+		ElseIf(theme == "united", "bs523"+theme).
+		ElseIf(theme == "vapor", "bs523"+theme).
+		ElseIf(theme == "yeti", "bs523"+theme).
+		ElseIf(theme == "zephyr", "bs523"+theme).
+		Else("bs523")
+
+	themeURL := d.UncdnHandlerEndpoint + "/" + themeStyle + ".css"
+
+	urls := []string{
+		themeURL,
+		// cdn.BootstrapIconsCss191(),
+	}
+	return urls
 }

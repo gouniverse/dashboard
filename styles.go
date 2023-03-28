@@ -4,12 +4,11 @@ import (
 	"strings"
 
 	"github.com/gouniverse/hb"
-	"github.com/gouniverse/uncdn"
 )
 
 func styles(stylesArray []string) string {
 	requiredStyles := []string{
-		uncdn.BootstrapCss521(),
+		// uncdn.BootstrapCss523(),
 	}
 
 	stylesArray = append(requiredStyles, stylesArray...)
