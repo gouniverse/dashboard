@@ -240,38 +240,22 @@ func (d Dashboard) top() string {
 				ID("ButtonUser").
 				Class("btn btn-secondary dropdown-toggle").
 				Attr("type", "button").
-				Attr("data-bs-toggle", "dropdown").
+				Data("bs-toggle", "dropdown").
 				HTML(d.user.FirstName + " " + d.user.LastName),
-			hb.NewUL().Class("dropdown-menu").
-				Children([]*hb.Tag{
-					hb.NewLI().Children([]*hb.Tag{
-						hb.NewHyperlink().Class("dropdown-item").HTML("Logout").Attr("href", "/auth/logout"),
-					}),
-				}),
-		})
-
-	projectsDropdown := hb.NewDiv().Class("dropdown").
-		Children([]*hb.Tag{
-			hb.NewButton().
-				ID("ButtonUser").
-				Class("btn btn-secondary dropdown-toggle").
-				Attr("type", "button").
-				Attr("data-bs-toggle", "dropdown").
-				HTML("Project: "),
 			hb.NewUL().Class("dropdown-menu").
 				Children([]*hb.Tag{
 					hb.NewLI().Children([]*hb.Tag{
 						hb.NewHyperlink().
 							Class("dropdown-item").
-							HTML("New Project").
-							Attr("href", "/user/projects/create"),
+							HTML("Logout").
+							Href("/auth/logout"),
 					}),
 				}),
 		})
 
 	buttonMenuToggle := hb.NewButton().Class("btn btn-secondary").
-		Attr("data-bs-toggle", "modal").
-		Attr("data-bs-target", "#ModalDashboardMenu").
+		Data("bs-toggle", "modal").
+		Data("bs-target", "#ModalDashboardMenu").
 		Children([]*hb.Tag{
 			icons.Icon("bi-list", 16, 16, "").Style("margin-top:-4px;margin-right:5px;"),
 			hb.NewSpan().HTML("Menu"),
@@ -279,8 +263,8 @@ func (d Dashboard) top() string {
 
 	buttonOffcanvasToggle := hb.NewButton().
 		Class("btn btn-secondary"). // outline-dark
-		Attr("data-bs-toggle", "offcanvas").
-		Attr("data-bs-target", "#OffcanvasMenu").
+		Data("bs-toggle", "offcanvas").
+		Data("bs-target", "#OffcanvasMenu").
 		Children([]*hb.Tag{
 			icons.Icon("bi-list", 16, 16, "").Style("margin-top:-4px;margin-right:5px;"),
 			hb.NewSpan().HTML("Menu"),
@@ -297,9 +281,10 @@ func (d Dashboard) top() string {
 		Style("background-color: #fff;z-index: 3;box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);transition: all .2s ease;").
 		Children([]*hb.Tag{
 			menu,
-			projectsDropdown,
-			hb.NewDiv().Class("float-end").Child(d.themeButton(d.ThemeName)),
-			hb.NewDiv().Class("float-end").Child(dropdownUser),
+			hb.NewDiv().Children([]*hb.Tag{
+				hb.NewDiv().Class("float-end").Child(d.themeButton(d.ThemeName)),
+				hb.NewDiv().Class("float-end").Child(dropdownUser),
+			}),
 		})
 
 	return toolbar.ToHTML()
@@ -317,19 +302,21 @@ func (d Dashboard) menuOffcanvas() *hb.Tag {
 		Class("offcanvas offcanvas-start text-bg-dark").
 		Attr("tabindex", "-1").
 		Children([]*hb.Tag{
-			hb.NewDiv().Class("offcanvas-header").Children([]*hb.Tag{
-				hb.NewHeading5().
-					Class("offcanvas-title").
-					HTML("Menu"),
-				hb.NewButton().
-					Class("btn-close btn-close-white").
-					Attr("type", "button").
-					Attr("data-bs-dismiss", "offcanvas").
-					Attr("aria-label", "Close"),
-			}),
-			hb.NewDiv().Class("offcanvas-body").Children([]*hb.Tag{
-				hb.NewHTML(d.dashboardLayoutMenu()),
-			}),
+			hb.NewDiv().Class("offcanvas-header").
+				Children([]*hb.Tag{
+					hb.NewHeading5().
+						Class("offcanvas-title").
+						HTML("Menu"),
+					hb.NewButton().
+						Class("btn-close btn-close-white").
+						Attr("type", "button").
+						Data("data-bs-dismiss", "offcanvas").
+						Attr("aria-label", "Close"),
+				}),
+			hb.NewDiv().Class("offcanvas-body").
+				Children([]*hb.Tag{
+					hb.NewHTML(d.dashboardLayoutMenu()),
+				}),
 		})
 
 	return offcanvasMenu
@@ -355,18 +342,23 @@ func (d Dashboard) menuModal() *hb.Tag {
 		hb.NewButton().
 			HTML("Close").
 			Class("btn btn-secondary w-100").
-			Attr("data-bs-dismiss", "modal"),
+			Data("bs-dismiss", "modal"),
 	})
 
-	modal := hb.NewDiv().ID("ModalDashboardMenu").Class("modal fade").AddChildren([]*hb.Tag{
-		hb.NewDiv().Class("modal-dialog modal-lg").AddChildren([]*hb.Tag{
-			hb.NewDiv().Class("modal-content").AddChildren([]*hb.Tag{
-				modalHeader,
-				modalBody,
-				modalFooter,
-			}),
-		}),
-	})
+	modal := hb.NewDiv().
+		ID("ModalDashboardMenu").
+		Class("modal fade").
+		Children([]*hb.Tag{
+			hb.NewDiv().Class("modal-dialog modal-lg").
+				Children([]*hb.Tag{
+					hb.NewDiv().Class("modal-content").
+						Children([]*hb.Tag{
+							modalHeader,
+							modalBody,
+							modalFooter,
+						}),
+				}),
+		})
 
 	return modal
 }
@@ -401,7 +393,7 @@ func (d Dashboard) left() string {
 		logoURL = utils.ImgPlaceholderURL(120, 80, "Logo")
 		placeholderLogo := hb.NewImage().Attr("src", logoURL).Style("width:100%;margin:0px 10px 0px 0px;")
 		adminDiv := hb.NewDiv().HTML("ADMIN PANEL").Style("font-size:12px;text-align: center;")
-		logo = hb.NewDiv().Class("Logo").AddChild(placeholderLogo).AddChild(adminDiv)
+		logo = hb.NewDiv().Class("Logo").Child(placeholderLogo).Child(adminDiv)
 	} else {
 		logo = hb.NewImage().Attr("src", logoURL).Style("width:100%;margin:0px 10px 0px 0px;")
 	}
@@ -498,7 +490,7 @@ func (d Dashboard) themeButton(themeName string) *hb.Tag {
 			hb.NewHyperlink().
 				Class("dropdown-item"+active).
 				HTML("(Light) "+name).
-				Attr("href", url).
+				Href(url).
 				Attr("ref", "nofollow"),
 		}))
 	})
@@ -513,7 +505,7 @@ func (d Dashboard) themeButton(themeName string) *hb.Tag {
 			hb.NewHyperlink().
 				Class("dropdown-item"+active).
 				HTML("(Dark) "+name).
-				Attr("href", url).
+				Href(url).
 				Attr("ref", "nofollow"),
 		}))
 	})
@@ -521,7 +513,7 @@ func (d Dashboard) themeButton(themeName string) *hb.Tag {
 		bs.Button().
 			ID("buttonTheme").
 			Class("btn-secondary dropdown-toggle").
-			Attr("data-bs-toggle", "dropdown").
+			Data("bs-toggle", "dropdown").
 			Children([]*hb.Tag{
 				lo.Ternary(isDark, icons.Icon("bi-brightness-high-fill", 16, 16, "#fff"), icons.Icon("bi-brightness-high-fill", 16, 16, "#333")),
 			}),
