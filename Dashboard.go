@@ -282,8 +282,12 @@ func (d Dashboard) top() string {
 		Children([]*hb.Tag{
 			menu,
 			hb.NewDiv().Children([]*hb.Tag{
-				hb.NewDiv().Class("float-end").Child(d.themeButton(d.ThemeName)),
-				hb.NewDiv().Class("float-end").Child(dropdownUser),
+				hb.NewDiv().Class("float-end").
+					Style("margin-left:10px;").
+					Child(dropdownUser),
+				hb.NewDiv().Class("float-end").
+					Style("margin-left:10px;").
+					Child(d.themeButton(d.ThemeName)),
 			}),
 		})
 
