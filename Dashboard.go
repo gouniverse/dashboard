@@ -33,27 +33,10 @@ type Dashboard struct {
 	UncdnHandlerEndpoint string
 }
 
-type MenuItem struct {
-	Title    string
-	URL      string
-	Target   string
-	Icon     string
-	Sequence int
-	Children []MenuItem
-}
-
-type User struct {
-	FirstName string
-	LastName  string
-}
-
 func (d Dashboard) layout() string {
 	content := d.Content
 	layout := hb.NewBorderLayout()
 	layout.AddTop(hb.NewHTML(d.top()), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_MIDDLE)
-	// layout.AddLeft(hb.NewHTML(d.left()), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_TOP)
-	// layout.AddBottom(hb.NewHTML("BOTTOM"), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_MIDDLE)
-	// layout.AddRight(hb.NewHTML("RIGHT"), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_TOP)
 	layout.AddCenter(hb.NewHTML(d.center(content)), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_TOP)
 	return layout.ToHTML()
 }
@@ -83,10 +66,13 @@ func (d Dashboard) ToHTML() string {
 	styleURLs := []string{
 		cdn.BootstrapIconsCss191(),
 	}
-
-	additionalStyles := []string{}
-
+	if d.UncdnHandlerEndpoint != "" {
+		styleURLs = d.themeStyleURLs(d.ThemeName)
+	} else {
+		styleURLs = append(styleURLs, cdn.BootstrapCss523())
+	}
 	styleURLs = append(styleURLs, d.StyleURLs...)
+	// additionalStyles := []string{}
 
 	scriptURLs := []string{}
 
@@ -98,10 +84,9 @@ func (d Dashboard) ToHTML() string {
 
 	webpage := hb.NewWebpage()
 	webpage.SetTitle(d.Title)
-	webpage.AddStyleURLs(d.themeStyleURLs(d.ThemeName))
 	webpage.AddStyleURLs(styleURLs)
 	webpage.AddStyle("html,body{width:100%; height:100%;}")
-	webpage.AddStyle(styles(append(d.Styles, additionalStyles...)))
+	// webpage.AddStyle(styles(append(d.Styles, additionalStyles...)))
 	webpage.AddStyle(d.styles())
 	webpage.AddScriptURLs(scriptURLs)
 	webpage.AddScript(scripts(d.Scripts))
@@ -565,7 +550,6 @@ func (d Dashboard) themeStyleURLs(theme string) []string {
 
 	urls := []string{
 		themeURL,
-		// cdn.BootstrapIconsCss191(),
 	}
 	return urls
 }

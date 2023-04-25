@@ -13,5 +13,8 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+development/.env
 development/tmp/
 oryxBuildBinary
+tmp/
+
