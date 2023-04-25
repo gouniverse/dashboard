@@ -2,6 +2,8 @@
 
 This is a project for quickly building dashboards
 
+## Development
+- https://gitpod.io/#https://github.com/gouniverse/dashboard
 
 ## Example
 
