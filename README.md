@@ -1,12 +1,6 @@
-# Dashboard
+# Dashboard <a href="https://gitpod.io/#https://github.com/gouniverse/dashboard"><img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in Gitpod" loading="lazy"></a>
 
 This is a project for quickly building dashboards
-
-## Development
-- https://gitpod.io/#https://github.com/gouniverse/dashboard
-<a href="https://gitpod.io/#https://github.com/gouniverse/dashboard">
-	<img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in Gitpod" loading="lazy">
-</a>
 
 ## Example
 
@@ -76,6 +70,14 @@ func layout(r *http.Request, opts AdminDashboardOptions) string {
 
     return dashboard.ToHTML()
 }
+```
+
+## Development
+For working on this package:
+- Open in Gitpod (use the button provided)
+- Run the command
+```
+task dev
 ```
 
 ## Noteworthy
