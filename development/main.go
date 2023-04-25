@@ -35,10 +35,10 @@ func main() {
 }
 
 func dashboard1(w http.ResponseWriter, r *http.Request) {
-	dashboardUser := dashboard.User{
-		FirstName: "John",
-		LastName:  "Doe",
-	}
+	// dashboardUser := dashboard.User{
+	// 	FirstName: "John",
+	// 	LastName:  "Doe",
+	// }
 	dashboard := dashboard.NewDashboard(dashboard.Config{
 		Menu: []dashboard.MenuItem{
 			{
@@ -50,7 +50,7 @@ func dashboard1(w http.ResponseWriter, r *http.Request) {
 				URL:   "/dashboard-2",
 			},
 		},
-		User: dashboardUser,
+		// User: dashboardUser,
 	})
 	html := dashboard.ToHTML()
 	w.Write([]byte(html))

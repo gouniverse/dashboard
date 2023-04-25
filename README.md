@@ -15,6 +15,10 @@ func dashboard(w http.ResponseWriter, r *http.Request) {
 				Title: "Home",
 				URL:   "/",
 			},
+            {
+				Title: "Logout",
+				URL:   "/auth/logout",
+			},
 		},
 	})
 	html := dashboard.ToHTML()

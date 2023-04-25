@@ -266,14 +266,18 @@ func (d Dashboard) top() string {
 		Style("background-color: #fff;z-index: 3;box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);transition: all .2s ease;padding-left: 20px;padding-right: 20px;").
 		Children([]*hb.Tag{
 			menu,
-			hb.NewDiv().Children([]*hb.Tag{
+			hb.If(d.user.FirstName != "" && d.user.LastName != "",
 				hb.NewDiv().Class("float-end").
 					Style("margin-left:10px;").
 					Child(dropdownUser),
-				hb.NewDiv().Class("float-end").
-					Style("margin-left:10px;").
-					Child(d.themeButton(d.ThemeName)),
-			}),
+			),
+			hb.If(d.ThemeHandlerUrl != "",
+				hb.NewDiv().Children([]*hb.Tag{
+					hb.NewDiv().Class("float-end").
+						Style("margin-left:10px;").
+						Child(d.themeButton(d.ThemeName)),
+				}),
+			),
 		})
 
 	return toolbar.ToHTML()
