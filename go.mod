@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/gouniverse/bs v0.6.1
-	github.com/gouniverse/cdn v0.0.3
+	github.com/gouniverse/cdn v0.1.0
 	github.com/gouniverse/hb v1.53.2
 	github.com/gouniverse/icons v1.3.0
 	github.com/gouniverse/responses v0.1.0

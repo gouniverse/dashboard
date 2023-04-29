@@ -64,12 +64,12 @@ func (d Dashboard) SetMenu(menuItems []MenuItem) Dashboard {
 
 func (d Dashboard) ToHTML() string {
 	styleURLs := []string{
-		cdn.BootstrapIconsCss191(),
+		cdn.BootstrapIconsCss_1_10_2(),
 	}
 	if d.UncdnHandlerEndpoint != "" {
 		styleURLs = d.themeStyleURLs(d.ThemeName)
 	} else {
-		styleURLs = append(styleURLs, cdn.BootstrapCss523())
+		styleURLs = append(styleURLs, cdn.BootstrapCss_5_2_3())
 	}
 	styleURLs = append(styleURLs, d.StyleURLs...)
 	// additionalStyles := []string{}
