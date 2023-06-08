@@ -19,6 +19,7 @@ func NewDashboard(config Config) Dashboard {
 	dashboard.Scripts = config.Scripts
 	dashboard.ScriptURLs = config.ScriptURLs
 	dashboard.Styles = config.Styles
+	dashboard.StyleURLs = config.StyleURLs
 	dashboard.MenuType = config.MenuType
 	dashboard.RedirectUrl = config.RedirectUrl
 	dashboard.RedirectTime = config.RedirectTime
