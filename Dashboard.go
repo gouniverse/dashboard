@@ -263,7 +263,7 @@ func (d Dashboard) top() string {
 	toolbar := hb.NewNav().
 		ID("Toolbar").
 		Class("navbar navbar-dark bg-dark").
-		Style("background-color: #fff;z-index: 3;box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);transition: all .2s ease;padding-left: 20px;padding-right: 20px;").
+		Style("background-color: #fff;z-index: 3;box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);transition: all .2s ease;padding-left: 20px;padding-right: 20px; display:block;").
 		Children([]*hb.Tag{
 			menu,
 			hb.If(d.user.FirstName != "" && d.user.LastName != "",
@@ -272,11 +272,9 @@ func (d Dashboard) top() string {
 					Child(dropdownUser),
 			),
 			hb.If(d.ThemeHandlerUrl != "",
-				hb.NewDiv().Children([]*hb.Tag{
-					hb.NewDiv().Class("float-end").
-						Style("margin-left:10px;").
-						Child(d.themeButton(d.ThemeName)),
-				}),
+				hb.NewDiv().Class("float-end").
+					Style("margin-left:10px;").
+					Child(d.themeButton(d.ThemeName)),
 			),
 		})
 
