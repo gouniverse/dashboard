@@ -1,4 +1,4 @@
-# Dashboard <a href="https://gitpod.io/#https://gitpod.io/#https://github.com/gouniverse/dashboard" style="float:right:"><img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in Gitpod" loading="lazy"></a>
+# Dashboard <a href="https://gitpod.io/#https://github.com/gouniverse/dashboard" style="float:right:"><img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in Gitpod" loading="lazy"></a>
 
 This is a project for quickly building dashboards
 
