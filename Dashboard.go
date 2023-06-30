@@ -17,6 +17,7 @@ const MENU_TYPE_OFFCANVAS = "offcanvas"
 type Dashboard struct {
 	menu                 []MenuItem
 	user                 User
+	userMenu             []MenuItem
 	MenuType             string
 	Title                string
 	Content              string
@@ -59,6 +60,11 @@ func (d Dashboard) SetUser(user User) Dashboard {
 
 func (d Dashboard) SetMenu(menuItems []MenuItem) Dashboard {
 	d.menu = menuItems
+	return d
+}
+
+func (d Dashboard) SetUserMenu(menuItems []MenuItem) Dashboard {
+	d.userMenu = menuItems
 	return d
 }
 
@@ -227,15 +233,27 @@ func (d Dashboard) top() string {
 				Attr("type", "button").
 				Data("bs-toggle", "dropdown").
 				HTML(d.user.FirstName + " " + d.user.LastName),
-			hb.NewUL().Class("dropdown-menu").
-				Children([]*hb.Tag{
-					hb.NewLI().Children([]*hb.Tag{
-						hb.NewHyperlink().
-							Class("dropdown-item").
-							HTML("Logout").
-							Href("/auth/logout"),
-					}),
-				}),
+			hb.NewUL().
+				Class("dropdown-menu").
+				Children(lo.Map(d.userMenu, func(item MenuItem, _ int) *hb.Tag {
+					target := lo.Ternary(item.Target == "", "_self", item.Target)
+					url := lo.Ternary(item.URL == "", "#", item.URL)
+
+					return hb.NewLI().Children([]*hb.Tag{
+						hb.If(item.Title == "",
+							hb.NewHR().
+								Class("dropdown-divider"),
+						),
+
+						hb.If(item.Title != "",
+							hb.NewHyperlink().
+								Class("dropdown-item").
+								HTML(item.Title).
+								Href(url).
+								Target(target),
+						),
+					})
+				})),
 		})
 
 	buttonMenuToggle := hb.NewButton().Class("btn btn-secondary").
@@ -265,12 +283,15 @@ func (d Dashboard) top() string {
 		Class("navbar navbar-dark bg-dark").
 		Style("background-color: #fff;z-index: 3;box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);transition: all .2s ease;padding-left: 20px;padding-right: 20px; display:block;").
 		Children([]*hb.Tag{
+			// Main Menu
 			menu,
+			// User Menu
 			hb.If(d.user.FirstName != "" && d.user.LastName != "",
 				hb.NewDiv().Class("float-end").
 					Style("margin-left:10px;").
 					Child(dropdownUser),
 			),
+			// Theme Switcher
 			hb.If(d.ThemeHandlerUrl != "",
 				hb.NewDiv().Class("float-end").
 					Style("margin-left:10px;").

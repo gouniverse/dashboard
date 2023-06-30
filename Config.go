@@ -24,4 +24,5 @@ type Config struct {
 	Title                string
 	UncdnHandlerEndpoint string
 	User                 User
+	UserMenu             []MenuItem
 }

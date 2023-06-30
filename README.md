@@ -54,12 +54,24 @@ func layout(r *http.Request, opts AdminDashboardOptions) string {
             LastName:  authUser.LastName(),
         }
         
+    dashboardUserMenu := []dashboard.MenuItem {
+        {
+            Title: "Profile",
+            URL: "/account/profile",
+        },
+        {
+            Title: "Logout",
+            URL: "/auth/logout",
+        }
+    }
+        
     dashboard := dashboard.NewDashboard(dashboard.Config{
         HTTPRequest: r,
         Content:     opts.Content,
         Title:       opts.Title,
-        Menu: ,
-        User: dashboardUser,
+        Menu:        dashboardMenu,
+        User:        dashboardUser,
+        UserMenu:    dashboardUserMenu,
         // ThemeHandlerUrl:      links.NewAdminLinks().Theme(map[string]string{"redirect": links.NewAdminLinks().Home(map[string]string{})}),
         // UncdnHandlerEndpoint: links.NewAdminLinks().Uncdn(map[string]string{}),
         Scripts:              opts.Scripts,

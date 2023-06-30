@@ -28,5 +28,6 @@ func NewDashboard(config Config) Dashboard {
 	dashboard.UncdnHandlerEndpoint = config.UncdnHandlerEndpoint
 	dashboard.menu = config.Menu
 	dashboard.user = config.User
+	dashboard.userMenu = config.UserMenu
 	return dashboard
 }
