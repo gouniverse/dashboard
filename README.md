@@ -14,7 +14,7 @@ func dashboard(w http.ResponseWriter, r *http.Request) {
 				Title: "Home",
 				URL:   "/",
 			},
-            {
+            		{
 				Title: "Logout",
 				URL:   "/auth/logout",
 			},
@@ -53,6 +53,17 @@ func layout(r *http.Request, opts AdminDashboardOptions) string {
             FirstName: authUser.FirstName(),
             LastName:  authUser.LastName(),
         }
+
+    dashboardQuickAccessMenu := []dashboard.MenuItem {
+        {
+            Title: "New post",
+            URL: "/post-create",
+        },
+        {
+            Title: "New page",
+            URL: "/page-create",
+        }
+    }
         
     dashboardUserMenu := []dashboard.MenuItem {
         {
@@ -72,6 +83,7 @@ func layout(r *http.Request, opts AdminDashboardOptions) string {
         Menu:        dashboardMenu,
         User:        dashboardUser,
         UserMenu:    dashboardUserMenu,
+	QuickAccessMenu:    dashboardQuickAccessMenu,
         // ThemeHandlerUrl:      links.NewAdminLinks().Theme(map[string]string{"redirect": links.NewAdminLinks().Home(map[string]string{})}),
         // UncdnHandlerEndpoint: links.NewAdminLinks().Uncdn(map[string]string{}),
         Scripts:              opts.Scripts,
