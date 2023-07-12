@@ -18,6 +18,7 @@ type Dashboard struct {
 	menu                 []MenuItem
 	user                 User
 	userMenu             []MenuItem
+	quickAccessMenu      []MenuItem
 	MenuType             string
 	Title                string
 	Content              string
@@ -37,7 +38,7 @@ type Dashboard struct {
 func (d Dashboard) layout() string {
 	content := d.Content
 	layout := hb.NewBorderLayout()
-	layout.AddTop(hb.NewHTML(d.top()), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_MIDDLE)
+	layout.AddTop(hb.NewHTML(d.topNavigation()), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_MIDDLE)
 	layout.AddCenter(hb.NewHTML(d.center(content)), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_TOP)
 	return layout.ToHTML()
 }
@@ -75,7 +76,7 @@ func (d Dashboard) ToHTML() string {
 	if d.UncdnHandlerEndpoint != "" {
 		styleURLs = d.themeStyleURLs(d.ThemeName)
 	} else {
-		styleURLs = append(styleURLs, cdn.BootstrapCss_5_2_3())
+		styleURLs = append(styleURLs, cdn.BootstrapCss_5_3_0())
 	}
 	styleURLs = append(styleURLs, d.StyleURLs...)
 	// additionalStyles := []string{}
@@ -224,15 +225,19 @@ func (d Dashboard) dashboardLayoutMenu() string {
 	return ul.ToHTML()
 }
 
-func (d Dashboard) top() string {
+func (d Dashboard) topNavigation() string {
 	dropdownUser := hb.NewDiv().Class("dropdown").
 		Children([]*hb.Tag{
 			hb.NewButton().
 				ID("ButtonUser").
 				Class("btn btn-secondary dropdown-toggle").
-				Attr("type", "button").
+				Style("background:none;border:0px;").
+				Type(hb.TYPE_BUTTON).
 				Data("bs-toggle", "dropdown").
-				HTML(d.user.FirstName + " " + d.user.LastName),
+				Children([]*hb.Tag{
+					icons.Icon("bi-person", 24, 24, "").Style("margin-top:-4px;margin-right:5px;"),
+					hb.NewSpan().HTML(d.user.FirstName + " " + d.user.LastName).Style("margin-right:10px;"),
+				}),
 			hb.NewUL().
 				Class("dropdown-menu").
 				Children(lo.Map(d.userMenu, func(item MenuItem, _ int) *hb.Tag {
@@ -256,20 +261,58 @@ func (d Dashboard) top() string {
 				})),
 		})
 
-	buttonMenuToggle := hb.NewButton().Class("btn btn-secondary").
+	dropdownQuickAccess := hb.NewDiv().Class("dropdown").
+		Children([]*hb.Tag{
+			hb.NewButton().
+				ID("ButtonUser").
+				Class("btn btn-secondary dropdown-toggle").
+				Style("background:none;border:0px;").
+				Type(hb.TYPE_BUTTON).
+				Data("bs-toggle", "dropdown").
+				Children([]*hb.Tag{
+					icons.Icon("bi-microsoft", 24, 24, "").Style("margin-top:-4px;margin-right:8px;"),
+					hb.NewSpan().HTML("Quick Access").Style("margin-right:10px;"),
+				}),
+			hb.NewUL().
+				Class("dropdown-menu").
+				Children(lo.Map(d.userMenu, func(item MenuItem, _ int) *hb.Tag {
+					target := lo.Ternary(item.Target == "", "_self", item.Target)
+					url := lo.Ternary(item.URL == "", "#", item.URL)
+
+					return hb.NewLI().Children([]*hb.Tag{
+						hb.If(item.Title == "",
+							hb.NewHR().
+								Class("dropdown-divider"),
+						),
+
+						hb.If(item.Title != "",
+							hb.NewHyperlink().
+								Class("dropdown-item").
+								HTML(item.Title).
+								Href(url).
+								Target(target),
+						),
+					})
+				})),
+		})
+
+	buttonMenuToggle := hb.NewButton().
+		Class("btn btn-secondary").
+		Style("background: none;").
 		Data("bs-toggle", "modal").
 		Data("bs-target", "#ModalDashboardMenu").
 		Children([]*hb.Tag{
-			icons.Icon("bi-list", 16, 16, "").Style("margin-top:-4px;margin-right:5px;"),
+			icons.Icon("bi-list", 24, 24, "").Style("margin-top:-4px;margin-right:5px;"),
 			hb.NewSpan().HTML("Menu"),
 		})
 
 	buttonOffcanvasToggle := hb.NewButton().
 		Class("btn btn-secondary"). // outline-dark
+		Style("background: none;").
 		Data("bs-toggle", "offcanvas").
 		Data("bs-target", "#OffcanvasMenu").
 		Children([]*hb.Tag{
-			icons.Icon("bi-list", 16, 16, "").Style("margin-top:-4px;margin-right:5px;"),
+			icons.Icon("bi-list", 24, 24, "").Style("margin-top:-4px;margin-right:5px;"),
 			hb.NewSpan().HTML("Menu"),
 		})
 
@@ -297,6 +340,9 @@ func (d Dashboard) top() string {
 					Style("margin-left:10px;").
 					Child(d.themeButton(d.ThemeName)),
 			),
+			hb.NewDiv().Class("float-end").
+				Style("margin-left:10px;").
+				Child(dropdownQuickAccess),
 		})
 
 	return toolbar.ToHTML()

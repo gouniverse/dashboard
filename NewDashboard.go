@@ -27,6 +27,7 @@ func NewDashboard(config Config) Dashboard {
 	dashboard.ThemeName = config.ThemeName
 	dashboard.UncdnHandlerEndpoint = config.UncdnHandlerEndpoint
 	dashboard.menu = config.Menu
+	dashboard.quickAccessMenu = config.QuickAccessMenu
 	dashboard.user = config.User
 	dashboard.userMenu = config.UserMenu
 	return dashboard

@@ -13,6 +13,7 @@ type Config struct {
 	LogoURL              string
 	Menu                 []MenuItem
 	MenuType             string
+	QuickAccessMenu      []MenuItem
 	RedirectTime         string
 	RedirectUrl          string
 	Scripts              []string

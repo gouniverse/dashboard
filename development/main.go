@@ -50,6 +50,16 @@ func dashboard1(w http.ResponseWriter, r *http.Request) {
 				URL:   "/dashboard-2",
 			},
 		},
+		QuickAccessMenu: []dashboard.MenuItem{
+			{
+				Title: "Add new post",
+				URL:   "/post-create",
+			},
+			{
+				Title: "Add new user",
+				URL:   "/user-create",
+			},
+		},
 		User: dashboardUser,
 		UserMenu: []dashboard.MenuItem{
 			{
