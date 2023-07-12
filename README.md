@@ -124,6 +124,8 @@ task dev
 
 ## Noteworthy
 
+- https://github.com/pro-dev-ph/bootstrap-simple-admin-template
+
 - https://github.com/PlainAdmin/plain-free-bootstrap-admin-template
 
 - https://github.com/tabler/tabler
