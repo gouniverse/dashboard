@@ -96,6 +96,24 @@ func layout(r *http.Request, opts AdminDashboardOptions) string {
 }
 ```
 
+## Screenshots
+
+- Main View
+
+<img src="./screenshots/Screenshot_MainView_20230712.png" />
+
+- Main Menu
+
+<img src="./screenshots/Screenshot_MainMenu_20230712.png" />
+
+- Main Menu
+
+<img src="./screenshots/Screenshot_QuickAccessMenu_20230712.png" />
+
+- User Menu
+
+<img src="./screenshots/Screenshot_UserMenu_20230712.png" />
+
 ## Development
 For working on this package:
 - Open in Gitpod (use the button provided)

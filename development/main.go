@@ -42,22 +42,36 @@ func dashboard1(w http.ResponseWriter, r *http.Request) {
 	dashboard := dashboard.NewDashboard(dashboard.Config{
 		Menu: []dashboard.MenuItem{
 			{
-				Title: "Dashboard 1",
+				Title: "Home",
 				URL:   "/",
+				Icon:  `<i class="bi bi-house"></i>`,
 			},
 			{
-				Title: "Dashboard 2",
-				URL:   "/dashboard-2",
+				Title: "Website Manager",
+				URL:   "/website-manager",
+				Icon:  `<i class="bi bi-globe"></i>`,
+			},
+			{
+				Title: "Blog Manager",
+				URL:   "/blog-manager",
+				Icon:  `<i class="bi bi-newspaper"></i>`,
+			},
+			{
+				Title: "User Manager",
+				URL:   "/user-manager",
+				Icon:  `<i class="bi bi-people"></i>`,
 			},
 		},
 		QuickAccessMenu: []dashboard.MenuItem{
 			{
 				Title: "Add new post",
 				URL:   "/post-create",
+				Icon:  `<i class="bi bi-plus-circle"></i>`,
 			},
 			{
 				Title: "Add new user",
 				URL:   "/user-create",
+				Icon:  `<i class="bi bi-plus-circle"></i>`,
 			},
 		},
 		User: dashboardUser,
@@ -65,6 +79,7 @@ func dashboard1(w http.ResponseWriter, r *http.Request) {
 			{
 				Title: "Profile",
 				URL:   "/account/profile",
+				Icon:  `<i class="bi bi-pencil"></i>`,
 			},
 			{
 				Title: "",
@@ -72,6 +87,7 @@ func dashboard1(w http.ResponseWriter, r *http.Request) {
 			{
 				Title: "Logout",
 				URL:   "/logout",
+				Icon:  `<i class="bi bi-box-arrow-right"></i>`,
 			},
 		},
 	})

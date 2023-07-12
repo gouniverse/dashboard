@@ -253,6 +253,7 @@ func (d Dashboard) topNavigation() string {
 						hb.If(item.Title != "",
 							hb.NewHyperlink().
 								Class("dropdown-item").
+								ChildIf(item.Icon != "", hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(item.Icon)).
 								HTML(item.Title).
 								Href(url).
 								Target(target),
@@ -275,7 +276,7 @@ func (d Dashboard) topNavigation() string {
 				}),
 			hb.NewUL().
 				Class("dropdown-menu").
-				Children(lo.Map(d.userMenu, func(item MenuItem, _ int) *hb.Tag {
+				Children(lo.Map(d.quickAccessMenu, func(item MenuItem, _ int) *hb.Tag {
 					target := lo.Ternary(item.Target == "", "_self", item.Target)
 					url := lo.Ternary(item.URL == "", "#", item.URL)
 
@@ -288,6 +289,7 @@ func (d Dashboard) topNavigation() string {
 						hb.If(item.Title != "",
 							hb.NewHyperlink().
 								Class("dropdown-item").
+								ChildIf(item.Icon != "", hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(item.Icon)).
 								HTML(item.Title).
 								Href(url).
 								Target(target),
@@ -340,9 +342,11 @@ func (d Dashboard) topNavigation() string {
 					Style("margin-left:10px;").
 					Child(d.themeButton(d.ThemeName)),
 			),
-			hb.NewDiv().Class("float-end").
+			// Quick Menu (if provided)
+			hb.If(len(d.quickAccessMenu) > 0, hb.NewDiv().
+				Class("float-end").
 				Style("margin-left:10px;").
-				Child(dropdownQuickAccess),
+				Child(dropdownQuickAccess)),
 		})
 
 	return toolbar.ToHTML()
