@@ -14,7 +14,7 @@ import (
 const MENU_TYPE_MODAL = "modal"
 const MENU_TYPE_OFFCANVAS = "offcanvas"
 
-type dashboardTemplateParams struct {
+type DashboardTemplateParams struct {
 	Title        string
 	Content      string
 	Scripts      []string
@@ -25,7 +25,7 @@ type dashboardTemplateParams struct {
 	RedirectTime string
 }
 
-type dashboard struct {
+type Dashboard struct {
 	menu                      []MenuItem
 	user                      User
 	userMenu                  []MenuItem
@@ -47,7 +47,7 @@ type dashboard struct {
 	UncdnHandlerEndpoint      string
 }
 
-func (d *dashboard) layout() string {
+func (d *Dashboard) layout() string {
 	content := d.Content
 	layout := hb.NewBorderLayout()
 	layout.AddTop(hb.NewHTML(d.topNavigation()), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_MIDDLE)
@@ -55,26 +55,26 @@ func (d *dashboard) layout() string {
 	return layout.ToHTML()
 }
 
-func (d *dashboard) SetUser(user User) *dashboard {
+func (d *Dashboard) SetUser(user User) *Dashboard {
 	d.user = user
 	return d
 }
 
-func (d *dashboard) SetMenu(menuItems []MenuItem) *dashboard {
+func (d *Dashboard) SetMenu(menuItems []MenuItem) *Dashboard {
 	d.menu = menuItems
 	return d
 }
 
-func (d *dashboard) SetUserMenu(menuItems []MenuItem) *dashboard {
+func (d *Dashboard) SetUserMenu(menuItems []MenuItem) *Dashboard {
 	d.userMenu = menuItems
 	return d
 }
 
-// ToHTML returns the HTML representation of the dashboard.
+// ToHTML returns the HTML representation of the Dashboard.
 //
 // It does not take any parameters.
 // It returns a string.
-func (d *dashboard) ToHTML() string {
+func (d *Dashboard) ToHTML() string {
 	styleURLs := []string{
 		// Icons
 		cdn.BootstrapIconsCss_1_10_2(),
@@ -206,7 +206,7 @@ func buildMenuItem(menuItem MenuItem, index int) *hb.Tag {
 		ul := hb.NewUL().
 			ID(submenuId).
 			Class("collapse hide nav flex-column ms-1").
-			Data("bs-parent", "#dashboardMenu")
+			Data("bs-parent", "#DashboardMenu")
 		for childIndex, childMenuItem := range children {
 			childItem := buildSubmenuItem(childMenuItem, childIndex)
 			ul.Child(childItem)
@@ -217,7 +217,7 @@ func buildMenuItem(menuItem MenuItem, index int) *hb.Tag {
 	return li
 }
 
-func (d *dashboard) dashboardLayoutMenu() string {
+func (d *Dashboard) DashboardLayoutMenu() string {
 	items := []*hb.Tag{}
 	for index, menuItem := range d.menu {
 		li := buildMenuItem(menuItem, index)
@@ -225,14 +225,14 @@ func (d *dashboard) dashboardLayoutMenu() string {
 	}
 
 	ul := hb.NewUL().
-		ID("dashboardMenu").
+		ID("DashboardMenu").
 		Class("navbar-nav justify-content-end flex-grow-1 pe-3").
 		Children(items)
 
 	return ul.ToHTML()
 }
 
-func (d *dashboard) topNavigation() string {
+func (d *Dashboard) topNavigation() string {
 	// isThemeDark := d.isThemeDark()
 	isNavbarBackgroundDark := lo.Ternary(d.navbarBackgroundColorMode == "light", false, true)
 
@@ -321,7 +321,7 @@ func (d *dashboard) topNavigation() string {
 		Class("btn "+buttonTheme).
 		Style("background: none;").
 		Data("bs-toggle", "modal").
-		Data("bs-target", "#ModaldashboardMenu").
+		Data("bs-target", "#ModalDashboardMenu").
 		Children([]*hb.Tag{
 			icons.Icon("bi-list", 24, 24, "").Style(iconStyle),
 			hb.NewSpan().HTML("Menu"),
@@ -371,13 +371,13 @@ func (d *dashboard) topNavigation() string {
 	return toolbar.ToHTML()
 }
 
-func (d *dashboard) center(content string) string {
+func (d *Dashboard) center(content string) string {
 	contentHolder := hb.NewDiv().Class("shadow p-3 m-3").HTML(content)
 	html := contentHolder.ToHTML()
 	return html
 }
 
-func (d *dashboard) menuOffcanvas() *hb.Tag {
+func (d *Dashboard) menuOffcanvas() *hb.Tag {
 	offcanvasMenu := hb.NewDiv().
 		ID("OffcanvasMenu").
 		Class("offcanvas offcanvas-start text-bg-dark").
@@ -396,14 +396,14 @@ func (d *dashboard) menuOffcanvas() *hb.Tag {
 				}),
 			hb.NewDiv().Class("offcanvas-body").
 				Children([]*hb.Tag{
-					hb.NewHTML(d.dashboardLayoutMenu()),
+					hb.NewHTML(d.DashboardLayoutMenu()),
 				}),
 		})
 
 	return offcanvasMenu
 }
 
-func (d *dashboard) menuModal() *hb.Tag {
+func (d *Dashboard) menuModal() *hb.Tag {
 	modalHeader := hb.NewDiv().Class("modal-header").
 		Children([]*hb.Tag{
 			hb.NewHeading5().HTML("Menu").Class("modal-title"),
@@ -416,7 +416,7 @@ func (d *dashboard) menuModal() *hb.Tag {
 		})
 
 	modalBody := hb.NewDiv().Class("modal-body").Children([]*hb.Tag{
-		hb.NewHTML(d.dashboardLayoutMenu()),
+		hb.NewHTML(d.DashboardLayoutMenu()),
 	})
 
 	modalFooter := hb.NewDiv().Class("modal-footer").Children([]*hb.Tag{
@@ -427,7 +427,7 @@ func (d *dashboard) menuModal() *hb.Tag {
 	})
 
 	modal := hb.NewDiv().
-		ID("ModaldashboardMenu").
+		ID("ModalDashboardMenu").
 		Class("modal fade").
 		Children([]*hb.Tag{
 			hb.NewDiv().Class("modal-dialog modal-lg").
@@ -444,8 +444,8 @@ func (d *dashboard) menuModal() *hb.Tag {
 	return modal
 }
 
-// func (d *dashboard) left() string {
-// 	menu := d.dashboardLayoutMenu()
+// func (d *Dashboard) left() string {
+// 	menu := d.DashboardLayoutMenu()
 
 // 	var logo *hb.Tag
 // 	logoURL := d.LogoURL
@@ -470,7 +470,7 @@ func (d *dashboard) menuModal() *hb.Tag {
 // 	return sideMenu.ToHTML()
 // }
 
-func (d *dashboard) styles() string {
+func (d *Dashboard) styles() string {
 	// @media (min-width: 1200px) {
 	// 	.span12, .container {
 	// 		width: 1170px;
@@ -498,7 +498,7 @@ func (d *dashboard) styles() string {
 	// 	background: #fff;
 	// }
 
-	// #ModaldashboardMenu .nav-item {
+	// #ModalDashboardMenu .nav-item {
 	// 	border: 1px solid #999;
 	// 	background: #eee;
 	// 	width: 100%;
@@ -507,7 +507,7 @@ func (d *dashboard) styles() string {
 	// 	padding: 10px;
 	// }
 
-	// #ModaldashboardMenu .nav-item:hover {
+	// #ModalDashboardMenu .nav-item:hover {
 	// 	background: cornsilk;
 	// }
 
@@ -534,11 +534,11 @@ html, body{
 	return css
 }
 
-// scripts returns the JavaScript code for the dashboard.
+// scripts returns the JavaScript code for the Dashboard.
 //
 // No parameters.
 // Returns a string.
-func (d *dashboard) scripts() string {
+func (d *Dashboard) scripts() string {
 	js := ``
 	return js
 }
@@ -552,13 +552,13 @@ func favicon() string {
 	return favicon
 }
 
-// isThemeDark checks if the theme of the dashboard is dark.
+// isThemeDark checks if the theme of the Dashboard is dark.
 //
-// It does so by checking if the dashboard's theme name is contained
+// It does so by checking if the Dashboard's theme name is contained
 // in the list of dark themes.
 //
 // Returns a boolean indicating whether the theme is dark.
-func (d *dashboard) isThemeDark() bool {
+func (d *Dashboard) isThemeDark() bool {
 	isDark := lo.Contains(lo.Keys(themesDark), d.ThemeName)
 	return isDark
 }
@@ -568,7 +568,7 @@ func (d *dashboard) isThemeDark() bool {
 // It checks if the current theme is dark and creates dropdown items for both light and dark themes.
 // The dropdown items are created dynamically based on the themesLight and themesDark maps.
 // The function returns a *hb.Tag that represents the generated dropdown menu.
-func (d *dashboard) themeButton() *hb.Tag {
+func (d *Dashboard) themeButton() *hb.Tag {
 	isDark := d.isThemeDark()
 
 	// Light Themes
