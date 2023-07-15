@@ -127,8 +127,10 @@ func layout(r *http.Request, opts AdminDashboardOptions) string {
 ## Development
 For working on this package:
 - Open in Gitpod (use the button provided)
-- Run the command
+- Run these commands sequentially
+- Open the browser URL displayed in the terminal
 ```
+task dev:init
 task dev
 ```
 
