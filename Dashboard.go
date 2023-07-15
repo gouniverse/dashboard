@@ -14,35 +14,6 @@ import (
 const MENU_TYPE_MODAL = "modal"
 const MENU_TYPE_OFFCANVAS = "offcanvas"
 
-type Dashboard struct {
-	menu                 []MenuItem
-	user                 User
-	userMenu             []MenuItem
-	quickAccessMenu      []MenuItem
-	MenuType             string
-	Title                string
-	Content              string
-	FaviconURL           string
-	LogoURL              string
-	Scripts              []string
-	ScriptURLs           []string
-	Styles               []string
-	StyleURLs            []string
-	RedirectUrl          string
-	RedirectTime         string
-	ThemeHandlerUrl      string
-	ThemeName            string
-	UncdnHandlerEndpoint string
-}
-
-func (d Dashboard) layout() string {
-	content := d.Content
-	layout := hb.NewBorderLayout()
-	layout.AddTop(hb.NewHTML(d.topNavigation()), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_MIDDLE)
-	layout.AddCenter(hb.NewHTML(d.center(content)), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_TOP)
-	return layout.ToHTML()
-}
-
 type DashboardTemplateParams struct {
 	Title        string
 	Content      string
@@ -54,22 +25,52 @@ type DashboardTemplateParams struct {
 	RedirectTime string
 }
 
-func (d Dashboard) SetUser(user User) Dashboard {
+type Dashboard struct {
+	menu                      []MenuItem
+	user                      User
+	userMenu                  []MenuItem
+	quickAccessMenu           []MenuItem
+	navbarBackgroundColorMode string
+	MenuType                  string
+	Title                     string
+	Content                   string
+	FaviconURL                string
+	LogoURL                   string
+	Scripts                   []string
+	ScriptURLs                []string
+	Styles                    []string
+	StyleURLs                 []string
+	RedirectUrl               string
+	RedirectTime              string
+	ThemeHandlerUrl           string
+	ThemeName                 string
+	UncdnHandlerEndpoint      string
+}
+
+func (d *Dashboard) layout() string {
+	content := d.Content
+	layout := hb.NewBorderLayout()
+	layout.AddTop(hb.NewHTML(d.topNavigation()), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_MIDDLE)
+	layout.AddCenter(hb.NewHTML(d.center(content)), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_TOP)
+	return layout.ToHTML()
+}
+
+func (d *Dashboard) SetUser(user User) *Dashboard {
 	d.user = user
 	return d
 }
 
-func (d Dashboard) SetMenu(menuItems []MenuItem) Dashboard {
+func (d *Dashboard) SetMenu(menuItems []MenuItem) *Dashboard {
 	d.menu = menuItems
 	return d
 }
 
-func (d Dashboard) SetUserMenu(menuItems []MenuItem) Dashboard {
+func (d *Dashboard) SetUserMenu(menuItems []MenuItem) *Dashboard {
 	d.userMenu = menuItems
 	return d
 }
 
-func (d Dashboard) ToHTML() string {
+func (d *Dashboard) ToHTML() string {
 	styleURLs := []string{
 		// Icons
 		cdn.BootstrapIconsCss_1_10_2(),
@@ -212,7 +213,7 @@ func buildMenuItem(menuItem MenuItem, index int) *hb.Tag {
 	return li
 }
 
-func (d Dashboard) dashboardLayoutMenu() string {
+func (d *Dashboard) dashboardLayoutMenu() string {
 	items := []*hb.Tag{}
 	for index, menuItem := range d.menu {
 		li := buildMenuItem(menuItem, index)
@@ -221,20 +222,30 @@ func (d Dashboard) dashboardLayoutMenu() string {
 
 	ul := hb.NewUL().
 		ID("DashboardMenu").
-		// Class("nav nav-pills flex-column mb-sm-auto mb-0 align-items-start").
 		Class("navbar-nav justify-content-end flex-grow-1 pe-3").
 		Children(items)
 
 	return ul.ToHTML()
 }
 
-func (d Dashboard) topNavigation() string {
+func (d *Dashboard) topNavigation() string {
+	// isThemeDark := d.isThemeDark()
+	isNavbarBackgroundDark := lo.Ternary(d.navbarBackgroundColorMode == "light", false, true)
+
+	navbarTheme := lo.
+		If(isNavbarBackgroundDark, "bg-dark text-bg-dark").
+		Else("bg-light text-bg-light")
+
+	buttonTheme := lo.
+		If(isNavbarBackgroundDark, "btn-dark").
+		Else("btn-light")
+
 	iconStyle := "margin-top:-4px;margin-right:5px;"
 	dropdownUser := hb.NewDiv().Class("dropdown").
 		Children([]*hb.Tag{
 			hb.NewButton().
 				ID("ButtonUser").
-				Class("btn dropdown-toggle").
+				Class("btn "+buttonTheme+" dropdown-toggle").
 				Style("background:none;border:0px;").
 				Type(hb.TYPE_BUTTON).
 				Data("bs-toggle", "dropdown").
@@ -270,7 +281,7 @@ func (d Dashboard) topNavigation() string {
 		Children([]*hb.Tag{
 			hb.NewButton().
 				ID("ButtonUser").
-				Class("btn dropdown-toggle").
+				Class("btn "+buttonTheme+" dropdown-toggle").
 				Style("background:none;border:0px;").
 				Type(hb.TYPE_BUTTON).
 				Data("bs-toggle", "dropdown").
@@ -303,7 +314,7 @@ func (d Dashboard) topNavigation() string {
 		})
 
 	buttonMenuToggle := hb.NewButton().
-		Class("btn").
+		Class("btn "+buttonTheme).
 		Style("background: none;").
 		Data("bs-toggle", "modal").
 		Data("bs-target", "#ModalDashboardMenu").
@@ -313,7 +324,7 @@ func (d Dashboard) topNavigation() string {
 		})
 
 	buttonOffcanvasToggle := hb.NewButton().
-		Class("btn"). // outline-dark
+		Class("btn "+buttonTheme).
 		Style("background: none;").
 		Data("bs-toggle", "offcanvas").
 		Data("bs-target", "#OffcanvasMenu").
@@ -329,7 +340,7 @@ func (d Dashboard) topNavigation() string {
 
 	toolbar := hb.NewNav().
 		ID("Toolbar").
-		Class("navbar").
+		Class("navbar " + navbarTheme).
 		Style("z-index: 3;box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);transition: all .2s ease;padding-left: 20px;padding-right: 20px; display:block;").
 		Children([]*hb.Tag{
 			// Main Menu
@@ -344,7 +355,7 @@ func (d Dashboard) topNavigation() string {
 			hb.If(d.ThemeHandlerUrl != "",
 				hb.NewDiv().Class("float-end").
 					Style("margin-left:10px;").
-					Child(d.themeButton(d.ThemeName)),
+					Child(d.themeButton()),
 			),
 			// Quick Menu (if provided)
 			hb.If(len(d.quickAccessMenu) > 0, hb.NewDiv().
@@ -429,31 +440,31 @@ func (d Dashboard) menuModal() *hb.Tag {
 	return modal
 }
 
-func (d Dashboard) left() string {
-	menu := d.dashboardLayoutMenu()
+// func (d Dashboard) left() string {
+// 	menu := d.dashboardLayoutMenu()
 
-	var logo *hb.Tag
-	logoURL := d.LogoURL
-	if logoURL == "" {
-		logoURL = utils.ImgPlaceholderURL(120, 80, "Logo")
-		placeholderLogo := hb.NewImage().
-			Src(logoURL).
-			Style("width:100%;margin:0px 10px 0px 0px;")
-		adminDiv := hb.NewDiv().
-			HTML("ADMIN PANEL").
-			Style("font-size:12px;text-align: center;")
-		logo = hb.NewDiv().Class("Logo").Child(placeholderLogo).Child(adminDiv)
-	} else {
-		logo = hb.NewImage().Attr("src", logoURL).Style("width:100%;margin:0px 10px 0px 0px;")
-	}
+// 	var logo *hb.Tag
+// 	logoURL := d.LogoURL
+// 	if logoURL == "" {
+// 		logoURL = utils.ImgPlaceholderURL(120, 80, "Logo")
+// 		placeholderLogo := hb.NewImage().
+// 			Src(logoURL).
+// 			Style("width:100%;margin:0px 10px 0px 0px;")
+// 		adminDiv := hb.NewDiv().
+// 			HTML("ADMIN PANEL").
+// 			Style("font-size:12px;text-align: center;")
+// 		logo = hb.NewDiv().Class("Logo").Child(placeholderLogo).Child(adminDiv)
+// 	} else {
+// 		logo = hb.NewImage().Attr("src", logoURL).Style("width:100%;margin:0px 10px 0px 0px;")
+// 	}
 
-	sideMenu := hb.NewDiv().ID("SideMenu").Class("p-4").Style("height:100%;width:200px;").
-		AddChildren([]*hb.Tag{
-			logo,
-			hb.NewDiv().Class("Menu").HTML(menu),
-		})
-	return sideMenu.ToHTML()
-}
+// 	sideMenu := hb.NewDiv().ID("SideMenu").Class("p-4").Style("height:100%;width:200px;").
+// 		AddChildren([]*hb.Tag{
+// 			logo,
+// 			hb.NewDiv().Class("Menu").HTML(menu),
+// 		})
+// 	return sideMenu.ToHTML()
+// }
 
 func (d Dashboard) styles() string {
 	// @media (min-width: 1200px) {
@@ -532,13 +543,18 @@ func favicon() string {
 	return favicon
 }
 
-func (d Dashboard) themeButton(themeName string) *hb.Tag {
-	isDark := lo.Contains(lo.Keys(themesDark), themeName)
+func (d *Dashboard) isThemeDark() bool {
+	isDark := lo.Contains(lo.Keys(themesDark), d.ThemeName)
+	return isDark
+}
+
+func (d *Dashboard) themeButton() *hb.Tag {
+	isDark := d.isThemeDark()
 
 	// Light Themes
 	lightDropdownItems := lo.Map(lo.Keys(themesLight), func(theme string, index int) *hb.Tag {
 		name := themesLight[theme]
-		active := lo.Ternary(themeName == theme, " active", "")
+		active := lo.Ternary(d.ThemeName == theme, " active", "")
 		url := lo.Ternary(strings.Contains(d.ThemeHandlerUrl, "?"), d.ThemeHandlerUrl+"&theme="+theme, d.ThemeHandlerUrl+"?theme="+theme)
 
 		return hb.NewLI().Children([]*hb.Tag{
@@ -553,7 +569,7 @@ func (d Dashboard) themeButton(themeName string) *hb.Tag {
 	// Dark Themes
 	darkDropdownItems := lo.Map(lo.Keys(themesDark), func(theme string, index int) *hb.Tag {
 		name := themesDark[theme]
-		active := lo.Ternary(themeName == theme, " active", "")
+		active := lo.Ternary(d.ThemeName == theme, " active", "")
 		url := lo.Ternary(strings.Contains(d.ThemeHandlerUrl, "?"), d.ThemeHandlerUrl+"&theme="+theme, d.ThemeHandlerUrl+"?theme="+theme)
 
 		return hb.NewLI().Children([]*hb.Tag{

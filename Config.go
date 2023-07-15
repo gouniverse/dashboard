@@ -7,12 +7,16 @@ type ThemeNameContextKey struct{}
 var THEME_COOKIE_KEY = "theme"
 
 type Config struct {
-	Content              string
-	FaviconURL           string
-	HTTPRequest          *http.Request
-	LogoURL              string
-	Menu                 []MenuItem
-	MenuType             string
+	Content     string
+	FaviconURL  string
+	HTTPRequest *http.Request
+	LogoURL     string
+	Menu        []MenuItem
+	MenuType    string
+
+	// The background color for the navbar, light or dark (default)
+	NavbarBackgroundColorMode string
+
 	QuickAccessMenu      []MenuItem
 	RedirectTime         string
 	RedirectUrl          string

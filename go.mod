@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/gouniverse/bs v0.10.1
-	github.com/gouniverse/cdn v0.5.0
+	github.com/gouniverse/cdn v0.7.0
 	github.com/gouniverse/hb v1.58.0
 	github.com/gouniverse/icons v1.3.0
 	github.com/gouniverse/responses v0.3.0
@@ -21,7 +21,7 @@ require (
 	github.com/tdewolff/minify/v2 v2.12.7 // indirect
 	github.com/tdewolff/parse/v2 v2.6.6 // indirect
 	golang.org/x/crypto v0.11.0 // indirect
-	golang.org/x/exp v0.0.0-20230711153332-06a737ee72cb // indirect
+	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect
 	golang.org/x/net v0.12.0 // indirect
 	golang.org/x/text v0.11.0 // indirect
 )

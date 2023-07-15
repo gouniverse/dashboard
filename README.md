@@ -1,6 +1,14 @@
 # Dashboard <a href="https://gitpod.io/#https://github.com/gouniverse/dashboard" style="float:right;"><img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in Gitpod" loading="lazy"></a>
 
-This is a project for quickly building dashboards
+This is a project for quickly building dashboards.
+
+- Uses the latest Bootstrap 5.3.0
+- Uses the latest Bootstrap Icons
+- Preset sidebar menu
+- Preset user dropdown menu
+- Preset quick access menu
+- Preset menu switcher
+- Supported all Bootswatch themes
 
 ## Example
 
@@ -77,19 +85,21 @@ func layout(r *http.Request, opts AdminDashboardOptions) string {
     }
         
     dashboard := dashboard.NewDashboard(dashboard.Config{
-        HTTPRequest: r,
-        Content:     opts.Content,
-        Title:       opts.Title,
-        Menu:        dashboardMenu,
-        User:        dashboardUser,
-        UserMenu:    dashboardUserMenu,
-	QuickAccessMenu:    dashboardQuickAccessMenu,
-        // ThemeHandlerUrl:      links.NewAdminLinks().Theme(map[string]string{"redirect": links.NewAdminLinks().Home(map[string]string{})}),
-        // UncdnHandlerEndpoint: links.NewAdminLinks().Uncdn(map[string]string{}),
-        Scripts:              opts.Scripts,
-        ScriptURLs:           opts.ScriptURLs,
-        Styles:               opts.Styles,
-        StyleURLs:            opts.StyleURLs,
+        HTTPRequest:                r,
+        Content:                    opts.Content,
+        Title:                      opts.Title,
+        Menu:                       dashboardMenu,
+        User:                       dashboardUser,
+        UserMenu:                   dashboardUserMenu,
+        QuickAccessMenu:            dashboardQuickAccessMenu,
+        Scripts:                    opts.Scripts,
+        ScriptURLs:                 opts.ScriptURLs,
+        Styles:                     opts.Styles,
+        StyleURLs:                  opts.StyleURLs,
+        // NavbarBackgroundColorMode: "light"                   // optional, defaults to dark
+        // ThemeName:                 dashboard.THEME_MINTY,    // optional, defaults to the default Bootstrap theme
+        // ThemeHandlerUrl:      links.NewAdminLinks().Theme(map[string]string{"redirect": links.NewAdminLinks().Home(map[string]string{})}),   // Optional (Advanced)
+        // UncdnHandlerEndpoint: links.NewAdminLinks().Uncdn(map[string]string{}),                                                              // Optional (Advanced)
     })
 
     return dashboard.ToHTML()
