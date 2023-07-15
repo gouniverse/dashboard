@@ -9,7 +9,6 @@ import (
 
 func scripts(scriptsArray []string) string {
 	requiredScripts := []string{
-		// uncdn.Jquery360(),
 		uncdn.BootstrapJs523(),
 	}
 
