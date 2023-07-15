@@ -93,9 +93,9 @@ func dashboard1(w http.ResponseWriter, r *http.Request) {
 		ThemeName:                 dashboard.THEME_MINTY,
 		ThemeHandlerUrl:           "/theme-switcher",
 		NavbarBackgroundColorMode: "light",
-	})
-	html := dashboard.ToHTML()
-	w.Write([]byte(html))
+	}).ToHTML()
+
+	w.Write([]byte(dashboard))
 }
 
 func dashboard2(w http.ResponseWriter, r *http.Request) {
