@@ -100,6 +100,7 @@ func (d *Dashboard) ToHTML() string {
 	webpage.SetTitle(d.Title)
 	webpage.AddStyleURLs(styleURLs)
 	webpage.AddStyle(d.styles())
+	webpage.AddStyles(d.Styles)
 	webpage.AddScriptURLs(scriptURLs)
 	webpage.AddScript(scripts(d.Scripts))
 	webpage.AddScript(d.scripts())
