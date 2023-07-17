@@ -8,31 +8,34 @@ func NewDashboard(config Config) *Dashboard {
 		config.MenuType = MENU_TYPE_OFFCANVAS // default
 	}
 
-	if config.ThemeName == "" && config.HTTPRequest != nil {
-		config.ThemeName = ThemeNameRetrieveFromCookie(config.HTTPRequest)
+	if config.Theme == "" && config.HTTPRequest != nil {
+		config.Theme = ThemeNameRetrieveFromCookie(config.HTTPRequest)
 	}
 
 	if config.NavbarBackgroundColorMode == "" {
 		config.NavbarBackgroundColorMode = "dark"
 	}
 
-	config.ThemeName = themeNameVerifyAndFix(config.ThemeName)
+	config.Theme = themeNameVerifyAndFix(config.Theme)
 
 	dashboard := &Dashboard{}
-	dashboard.Title = config.Title
-	dashboard.Content = config.Content
-	dashboard.FaviconURL = config.FaviconURL
-	dashboard.LogoURL = config.LogoURL
+	dashboard.title = config.Title
+	dashboard.content = config.Content
+	dashboard.faviconURL = config.FaviconURL
+	dashboard.logoURL = config.LogoURL
+	dashboard.loginURL = config.LoginURL
+	dashboard.registerURL = config.RegisterURL
 	dashboard.navbarBackgroundColorMode = config.NavbarBackgroundColorMode
-	dashboard.Scripts = config.Scripts
-	dashboard.ScriptURLs = config.ScriptURLs
-	dashboard.Styles = config.Styles
-	dashboard.StyleURLs = config.StyleURLs
-	dashboard.MenuType = config.MenuType
-	dashboard.RedirectUrl = config.RedirectUrl
-	dashboard.RedirectTime = config.RedirectTime
+	dashboard.scripts = config.Scripts
+	dashboard.scriptURLs = config.ScriptURLs
+	dashboard.styles = config.Styles
+	dashboard.styleURLs = config.StyleURLs
+	dashboard.menuType = config.MenuType
+	dashboard.redirectUrl = config.RedirectUrl
+	dashboard.redirectTime = config.RedirectTime
 	dashboard.ThemeHandlerUrl = config.ThemeHandlerUrl
-	dashboard.ThemeName = config.ThemeName
+	dashboard.theme = config.Theme
+	dashboard.themesRestrict = config.ThemesRestrict
 	dashboard.UncdnHandlerEndpoint = config.UncdnHandlerEndpoint
 	dashboard.menu = config.Menu
 	dashboard.quickAccessMenu = config.QuickAccessMenu

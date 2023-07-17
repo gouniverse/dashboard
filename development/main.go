@@ -74,7 +74,9 @@ func dashboard1(w http.ResponseWriter, r *http.Request) {
 				Icon:  `<i class="bi bi-plus-circle"></i>`,
 			},
 		},
-		User: dashboardUser,
+		LoginURL:    "/login",
+		RegisterURL: "/register",
+		User:        dashboardUser,
 		UserMenu: []dashboard.MenuItem{
 			{
 				Title: "Profile",
@@ -90,8 +92,12 @@ func dashboard1(w http.ResponseWriter, r *http.Request) {
 				Icon:  `<i class="bi bi-box-arrow-right"></i>`,
 			},
 		},
-		ThemeName:                 dashboard.THEME_MINTY,
-		ThemeHandlerUrl:           "/theme-switcher",
+		Theme:           dashboard.THEME_MINTY,
+		ThemeHandlerUrl: "/theme-switcher",
+		ThemesRestrict: map[string]string{
+			dashboard.THEME_MINTY:  "Light theme",
+			dashboard.THEME_FLATLY: "Dark theme",
+		},
 		NavbarBackgroundColorMode: "light",
 	}).ToHTML()
 
@@ -115,7 +121,7 @@ func dashboard2(w http.ResponseWriter, r *http.Request) {
 			},
 		},
 		User:                      dashboardUser,
-		ThemeName:                 dashboard.THEME_MINTY,
+		Theme:                     dashboard.THEME_MINTY,
 		NavbarBackgroundColorMode: "light",
 	})
 	html := dashboard.ToHTML()

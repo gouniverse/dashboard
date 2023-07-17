@@ -14,18 +14,33 @@ type Config struct {
 	Menu        []MenuItem
 	MenuType    string
 
-	// The background color for the navbar, light or dark (default)
+	// Optional The background color for the navbar, light or dark (default)
 	NavbarBackgroundColorMode string
 
-	QuickAccessMenu      []MenuItem
-	RedirectTime         string
-	RedirectUrl          string
-	Scripts              []string
-	ScriptURLs           []string
-	Styles               []string
-	StyleURLs            []string
-	ThemeName            string
-	ThemeHandlerUrl      string
+	// Optional. The URL of the login page to use (if user is not provided)
+	LoginURL string
+
+	// Optional. The URL of the register page to use (if user is not provided)
+	RegisterURL string
+
+	// Optional. Menu for Quick Access
+	QuickAccessMenu []MenuItem
+	RedirectTime    string
+	RedirectUrl     string
+	Scripts         []string
+	ScriptURLs      []string
+	Styles          []string
+	StyleURLs       []string
+
+	// Optional. The theme to be activated on the dashboard (default will be used otherwise)
+	Theme string
+
+	// Optional. The URL of the theme switcher endpoint to use
+	ThemeHandlerUrl string
+
+	// Optional. The themes to be visible in the theme switcher, the key is the theme, the value is the name (can be customized, default will be used otherwise)
+	ThemesRestrict map[string]string
+
 	Title                string
 	UncdnHandlerEndpoint string
 	User                 User
