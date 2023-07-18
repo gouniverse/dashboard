@@ -143,7 +143,9 @@ func (d *Dashboard) ToHTML() string {
 	// webpage.AddScript(scripts(d.scripts))
 	webpage.SetFavicon(faviconURL)
 	if d.redirectUrl != "" && d.redirectTime != "" {
-		webpage.Head.AddChild(hb.NewMeta().Attr("http-equiv", "refresh").Attr("content", d.redirectTime+"; url = "+d.redirectUrl))
+		webpage.Meta(hb.NewMeta().
+			Attr("http-equiv", "refresh").
+			Attr("content", d.redirectTime+"; url = "+d.redirectUrl))
 	}
 
 	menu := d.menuOffcanvas().ToHTML()
