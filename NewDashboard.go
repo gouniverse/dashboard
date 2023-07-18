@@ -33,10 +33,10 @@ func NewDashboard(config Config) *Dashboard {
 	dashboard.menuType = config.MenuType
 	dashboard.redirectUrl = config.RedirectUrl
 	dashboard.redirectTime = config.RedirectTime
-	dashboard.ThemeHandlerUrl = config.ThemeHandlerUrl
+	dashboard.themeHandlerUrl = config.ThemeHandlerUrl
 	dashboard.theme = config.Theme
 	dashboard.themesRestrict = config.ThemesRestrict
-	dashboard.UncdnHandlerEndpoint = config.UncdnHandlerEndpoint
+	dashboard.uncdnHandlerEndpoint = config.UncdnHandlerEndpoint
 	dashboard.menu = config.Menu
 	dashboard.quickAccessMenu = config.QuickAccessMenu
 	dashboard.user = config.User

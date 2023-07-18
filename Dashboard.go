@@ -7,6 +7,7 @@ import (
 	"github.com/gouniverse/cdn"
 	"github.com/gouniverse/hb"
 	"github.com/gouniverse/icons"
+	"github.com/gouniverse/uncdn"
 	"github.com/gouniverse/utils"
 	"github.com/samber/lo"
 )
@@ -51,7 +52,7 @@ type Dashboard struct {
 	redirectTime string
 
 	// Optional. The URL of the theme switcher endpoint to use
-	ThemeHandlerUrl string
+	themeHandlerUrl string
 
 	// Optional. The theme name to be activated on the dashboard (default will be used otherwise)
 	theme string
@@ -60,7 +61,7 @@ type Dashboard struct {
 	themesRestrict map[string]string
 
 	// Optional. The URL of the UNCDN hadler endpoint to use
-	UncdnHandlerEndpoint string
+	uncdnHandlerEndpoint string
 }
 
 func (d *Dashboard) layout() string {
@@ -95,18 +96,23 @@ func (d *Dashboard) ToHTML() string {
 		// Icons
 		cdn.BootstrapIconsCss_1_10_2(),
 	}
-	// Theme
-	if d.UncdnHandlerEndpoint != "" {
-		styleURLs = append(styleURLs, uncdnThemeStyleURL(d.UncdnHandlerEndpoint, d.theme))
+
+	// Bootstrap Css
+	if d.uncdnHandlerEndpoint != "" {
+		styleURLs = append(styleURLs, uncdnThemeStyleURL(d.uncdnHandlerEndpoint, d.theme))
 	} else {
 		styleURLs = append(styleURLs, cdnThemeStyleUrl(d.theme))
 	}
-	// Other Style URLs
-	// styleURLs = append(styleURLs, d.styleURLs...)
 
 	scriptURLs := []string{}
 
-	// scriptURLs = append(scriptURLs, d.scriptURLs...)
+	// Bootstrap JS
+	if d.uncdnHandlerEndpoint != "" {
+		scriptURLs = append(scriptURLs, uncdn.BootstrapJs523())
+	} else {
+		scriptURLs = append(scriptURLs, cdn.BootstrapJs_5_3_0())
+	}
+
 	faviconURL := d.faviconURL
 	if faviconURL == "" {
 		faviconURL = favicon()
@@ -114,14 +120,26 @@ func (d *Dashboard) ToHTML() string {
 
 	webpage := hb.NewWebpage()
 	webpage.SetTitle(d.title)
+
+	// Required Style URLs
 	webpage.AddStyleURLs(styleURLs)
+	// User Style URLs
 	webpage.AddStyleURLs(d.styleURLs)
+	// Dashboard Styles
 	webpage.AddStyle(d.dashboardStyle())
+	// User Styles
 	webpage.AddStyles(d.styles)
+
+	// Required Script URLs
 	webpage.AddScriptURLs(scriptURLs)
+	// User Script URLs
 	webpage.AddScriptURLs(d.scriptURLs)
+
+	// Dashboard Scripts
 	webpage.AddScript(d.dashboardScript())
+	// User Scripts
 	webpage.AddScripts(d.scripts)
+
 	// webpage.AddScript(scripts(d.scripts))
 	webpage.SetFavicon(faviconURL)
 	if d.redirectUrl != "" && d.redirectTime != "" {
@@ -398,7 +416,7 @@ func (d *Dashboard) topNavigation() string {
 			),
 
 			// Theme Switcher
-			hb.If(d.ThemeHandlerUrl != "",
+			hb.If(d.themeHandlerUrl != "",
 				hb.NewDiv().Class("float-end").
 					Style("margin-left:10px;").
 					Child(d.themeButton()),
@@ -514,66 +532,9 @@ func (d *Dashboard) menuModal() *hb.Tag {
 // }
 
 func (d *Dashboard) dashboardStyle() string {
-	// @media (min-width: 1200px) {
-	// 	.span12, .container {
-	// 		width: 1170px;
-	// 	}
-	// }
-	// #SideMenu{
-	// 	background: #343957;
-	// }
-	// #SideMenu a {
-	// 	color: #fff;
-	// }
-	// #SideMenu div.Logo {
-	// 	border:2px solid #999;
-	// 	color:#666;
-	// 	background: #eee;
-	// }
-	// #SideMenu div.Menu {
-	// 	margin: 30px 0px 30px 0px;
-	// 	padding: 10px 10px 10px 10px;
-	// 	background: #444;
-	// 	background-image: linear-gradient(to right, #444 , #555, #444);
-	// 	border-radius: 5px;
-	// }
-	// #Toolbar{
-	// 	background: #fff;
-	// }
+	fullHeightSupport := `html, body{ height: 100%; }`
 
-	// #ModalDashboardMenu .nav-item {
-	// 	border: 1px solid #999;
-	// 	background: #eee;
-	// 	width: 100%;
-	// 	margin: 10px 0px;
-	// 	border-radius: 10px;
-	// 	padding: 10px;
-	// }
-
-	// #ModalDashboardMenu .nav-item:hover {
-	// 	background: cornsilk;
-	// }
-
-	// .well {
-	// 	min-height: 20px;
-	// 	padding: 19px;
-	// 	margin-bottom: 20px;
-	// 	background-color: #fafafa;
-	// 	border: 1px solid #e8e8e8;
-	// 	border-radius: 0;
-	// 	box-shadow: inset 0 1px 1px rgba(0,0,0,0.05);
-	// }
-	// html, body{
-	// 	height: 100%;
-	// 	background: #eee;
-	// }
-
-	css := `
-html, body{
-	height: 100%;
-}
-	`
-
+	css := fullHeightSupport
 	return css
 }
 
@@ -623,7 +584,7 @@ func (d *Dashboard) themeButton() *hb.Tag {
 	lightDropdownItems := lo.Map(lo.Keys(themesLight), func(theme string, index int) *hb.Tag {
 		name := themesLight[theme]
 		active := lo.Ternary(d.theme == theme, " active", "")
-		url := lo.Ternary(strings.Contains(d.ThemeHandlerUrl, "?"), d.ThemeHandlerUrl+"&theme="+theme, d.ThemeHandlerUrl+"?theme="+theme)
+		url := lo.Ternary(strings.Contains(d.themeHandlerUrl, "?"), d.themeHandlerUrl+"&theme="+theme, d.themeHandlerUrl+"?theme="+theme)
 
 		if len(d.themesRestrict) > 0 {
 			if customName, exists := d.themesRestrict[theme]; exists {
@@ -647,7 +608,7 @@ func (d *Dashboard) themeButton() *hb.Tag {
 	darkDropdownItems := lo.Map(lo.Keys(themesDark), func(theme string, index int) *hb.Tag {
 		name := themesDark[theme]
 		active := lo.Ternary(d.theme == theme, " active", "")
-		url := lo.Ternary(strings.Contains(d.ThemeHandlerUrl, "?"), d.ThemeHandlerUrl+"&theme="+theme, d.ThemeHandlerUrl+"?theme="+theme)
+		url := lo.Ternary(strings.Contains(d.themeHandlerUrl, "?"), d.themeHandlerUrl+"&theme="+theme, d.themeHandlerUrl+"?theme="+theme)
 
 		if len(d.themesRestrict) > 0 {
 			if customName, exists := d.themesRestrict[theme]; exists {
