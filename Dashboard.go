@@ -42,14 +42,15 @@ type Dashboard struct {
 	content string
 
 	// Optional. The URL of the favicon (base64 encoded can be used, default will be used otherwise)
-	faviconURL   string
-	logoURL      string
-	scripts      []string
-	scriptURLs   []string
-	styles       []string
-	styleURLs    []string
-	redirectUrl  string
-	redirectTime string
+	faviconURL      string
+	logoImageURL    string
+	logoRedirectURL string
+	scripts         []string
+	scriptURLs      []string
+	styles          []string
+	styleURLs       []string
+	redirectUrl     string
+	redirectTime    string
 
 	// Optional. The URL of the theme switcher endpoint to use
 	themeHandlerUrl string
@@ -279,6 +280,9 @@ func (d *Dashboard) DashboardLayoutMenu() string {
 func (d *Dashboard) topNavigation() string {
 	isNavbarBackgroundDark := lo.Ternary(d.navbarBackgroundColorMode == "light", false, true)
 
+	hasLogo := lo.Ternary(d.logoImageURL != "", true, false)
+	logoRedirectURL := lo.Ternary(d.logoRedirectURL != "", d.logoRedirectURL, "#")
+
 	navbarTheme := lo.
 		If(isNavbarBackgroundDark, "bg-dark text-bg-dark").
 		Else("bg-light text-bg-light")
@@ -386,10 +390,20 @@ func (d *Dashboard) topNavigation() string {
 		mainMenu = buttonMenuToggle
 	}
 
+	logo := hb.NewHyperlink().
+		Href(logoRedirectURL).
+		Class("navbar-brand").
+		Child(
+			hb.NewImage().
+				Src(d.logoImageURL).
+				Style("max-height:35px;"),
+		)
+
 	toolbar := hb.NewNav().
 		ID("Toolbar").
-		Class("navbar " + navbarTheme).
+		Class("navbar "+navbarTheme).
 		Style("z-index: 3;box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);transition: all .2s ease;padding-left: 20px;padding-right: 20px; display:block;").
+		ChildIf(hasLogo, logo).
 		Children([]*hb.Tag{
 			mainMenu,
 			// User Menu

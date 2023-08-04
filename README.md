@@ -12,7 +12,7 @@ This is a project for quickly building dashboards.
 
 ## Example
 
-- Adding to HTTP handled
+- Adding to an HTTP handler
 
 ```golang
 func dashboard(w http.ResponseWriter, r *http.Request) {
@@ -37,6 +37,9 @@ func dashboard(w http.ResponseWriter, r *http.Request) {
 ```golang
 func layout(r *http.Request, opts AdminDashboardOptions) string {
     authUser := helpers.GetAuthUser(r)
+
+    logoImageURL = "YOUR_IMAGE_URL.png"
+	logoRedirectURL = "/"
 
     dashboardMenu := []dashboard.MenuItem{
             {
@@ -88,6 +91,8 @@ func layout(r *http.Request, opts AdminDashboardOptions) string {
         HTTPRequest:                r,
         Content:                    opts.Content,
         Title:                      opts.Title,
+        LogoImageURL                logoImageURL,
+        LogoRedirectURL             logoRedirectURL,
         Menu:                       dashboardMenu,
         User:                       dashboardUser,
         UserMenu:                   dashboardUserMenu,

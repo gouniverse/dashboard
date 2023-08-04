@@ -14,6 +14,12 @@ type Config struct {
 	Menu        []MenuItem
 	MenuType    string
 
+	// Optional. The URL of the logo image
+	LogoImageURL string
+
+	// Optional. The redirect URL of the logo image
+	LogoRedirectURL string
+
 	// Optional The background color for the navbar, light or dark (default)
 	NavbarBackgroundColorMode string
 

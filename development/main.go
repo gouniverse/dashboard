@@ -40,6 +40,7 @@ func dashboard1(w http.ResponseWriter, r *http.Request) {
 		LastName:  "Doe",
 	}
 	dashboard := dashboard.NewDashboard(dashboard.Config{
+		LogoURL: "https://pro-dev-ph.github.io/bootstrap-simple-admin-template/assets/img/bootstraper-logo.png",
 		Menu: []dashboard.MenuItem{
 			{
 				Title: "Home",
