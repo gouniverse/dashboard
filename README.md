@@ -154,3 +154,9 @@ task dev
 - https://dribbble.com/shots/19114068-Dashboard
 
 - https://demo.themefisher.com/focus/
+
+## Similar Golang Projects
+- https://github.com/oal/admin
+- https://github.com/uadmin/uadmin
+- https://github.com/GoAdminGroup/go-admin
+- https://github.com/entkit/entkit
