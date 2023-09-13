@@ -121,7 +121,7 @@ func layout(r *http.Request, opts AdminDashboardOptions) string {
 
 <img src="./screenshots/Screenshot_MainMenu_20230712.png" />
 
-- Main Menu
+- Quick Access Menu
 
 <img src="./screenshots/Screenshot_QuickAccessMenu_20230712.png" />
 
@@ -156,7 +156,11 @@ task dev
 - https://demo.themefisher.com/focus/
 
 ## Similar Golang Projects
+
 - https://github.com/oal/admin
+
 - https://github.com/uadmin/uadmin
+
 - https://github.com/GoAdminGroup/go-admin
+
 - https://github.com/entkit/entkit
