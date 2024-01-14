@@ -2,7 +2,7 @@
 
 This is a project for quickly building dashboards.
 
-- Uses the latest Bootstrap 5.3.0
+- Uses the latest Bootstrap 5.3.1
 - Uses the latest Bootstrap Icons
 - Preset sidebar menu
 - Preset user dropdown menu
