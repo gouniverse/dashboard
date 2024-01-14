@@ -95,7 +95,7 @@ func (d *Dashboard) SetUserMenu(menuItems []MenuItem) *Dashboard {
 func (d *Dashboard) ToHTML() string {
 	styleURLs := []string{
 		// Icons
-		cdn.BootstrapIconsCss_1_10_2(),
+		cdn.BootstrapIconsCss_1_11_3(),
 	}
 
 	// Bootstrap Css
@@ -111,7 +111,7 @@ func (d *Dashboard) ToHTML() string {
 	if d.uncdnHandlerEndpoint != "" {
 		scriptURLs = append(scriptURLs, uncdn.BootstrapJs523())
 	} else {
-		scriptURLs = append(scriptURLs, cdn.BootstrapJs_5_3_0())
+		scriptURLs = append(scriptURLs, cdn.BootstrapJs_5_3_1())
 	}
 
 	faviconURL := d.faviconURL
@@ -124,20 +124,25 @@ func (d *Dashboard) ToHTML() string {
 
 	// Required Style URLs
 	webpage.AddStyleURLs(styleURLs)
+
 	// User Style URLs
 	webpage.AddStyleURLs(d.styleURLs)
+
 	// Dashboard Styles
 	webpage.AddStyle(d.dashboardStyle())
+
 	// User Styles
 	webpage.AddStyles(d.styles)
 
 	// Required Script URLs
 	webpage.AddScriptURLs(scriptURLs)
+
 	// User Script URLs
 	webpage.AddScriptURLs(d.scriptURLs)
 
 	// Dashboard Scripts
 	webpage.AddScript(d.dashboardScript())
+
 	// User Scripts
 	webpage.AddScripts(d.scripts)
 
@@ -303,7 +308,9 @@ func (d *Dashboard) topNavigation() string {
 				Data("bs-toggle", "dropdown").
 				Children([]*hb.Tag{
 					icons.Icon("bi-person", 24, 24, "").Style(iconStyle),
-					hb.NewSpan().HTML(d.user.FirstName + " " + d.user.LastName).Style("margin-right:10px;"),
+					hb.NewSpan().
+						Text(d.user.FirstName + " " + d.user.LastName).
+						Style("margin-right:10px;"),
 				}),
 			hb.NewUL().
 				Class("dropdown-menu").
@@ -321,7 +328,7 @@ func (d *Dashboard) topNavigation() string {
 							hb.NewHyperlink().
 								Class("dropdown-item").
 								ChildIf(item.Icon != "", hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(item.Icon)).
-								HTML(item.Title).
+								Text(item.Title).
 								Href(url).
 								Target(target),
 						),
@@ -339,7 +346,7 @@ func (d *Dashboard) topNavigation() string {
 				Data("bs-toggle", "dropdown").
 				Children([]*hb.Tag{
 					icons.Icon("bi-microsoft", 24, 24, "").Style("margin-top:-4px;margin-right:8px;"),
-					hb.NewSpan().HTML("Quick Access").Style("margin-right:10px;"),
+					hb.NewSpan().Text("Quick Access").Style("margin-right:10px;"),
 				}),
 			hb.NewUL().
 				Class("dropdown-menu").
@@ -357,7 +364,7 @@ func (d *Dashboard) topNavigation() string {
 							hb.NewHyperlink().
 								Class("dropdown-item").
 								ChildIf(item.Icon != "", hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(item.Icon)).
-								HTML(item.Title).
+								Text(item.Title).
 								Href(url).
 								Target(target),
 						),
@@ -416,7 +423,7 @@ func (d *Dashboard) topNavigation() string {
 			// Register Link
 			hb.If(lo.IsEmpty(d.user) && d.registerURL != "",
 				hb.NewHyperlink().
-					HTML("Register").
+					Text("Register").
 					Href(d.registerURL).
 					Class("btn "+buttonTheme+" float-end").
 					Style("margin-left:10px;"),
@@ -425,7 +432,7 @@ func (d *Dashboard) topNavigation() string {
 			// Login Link
 			hb.If(lo.IsEmpty(d.user) && d.loginURL != "",
 				hb.NewHyperlink().
-					HTML("Login").
+					Text("Login").
 					Href(d.loginURL).
 					Class("btn "+buttonTheme+" float-end").
 					Style("margin-left:10px;"),
@@ -464,10 +471,10 @@ func (d *Dashboard) menuOffcanvas() *hb.Tag {
 				Children([]*hb.Tag{
 					hb.NewHeading5().
 						Class("offcanvas-title").
-						HTML("Menu"),
+						Text("Menu"),
 					hb.NewButton().
 						Class("btn-close btn-close-white").
-						Attr("type", "button").
+						Type(hb.TYPE_BUTTON).
 						Data("bs-dismiss", "offcanvas").
 						Attr("aria-label", "Close"),
 				}),
