@@ -17,6 +17,9 @@ type Config struct {
 	// Optional. The URL of the logo image
 	LogoImageURL string
 
+	// Optional. Raw HTML of the logo, if set will be used instead of logoImageURL
+	LogoRawHtml string
+
 	// Optional. The redirect URL of the logo image
 	LogoRedirectURL string
 

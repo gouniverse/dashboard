@@ -23,6 +23,7 @@ func NewDashboard(config Config) *Dashboard {
 	dashboard.content = config.Content
 	dashboard.faviconURL = config.FaviconURL
 	dashboard.logoImageURL = config.LogoImageURL
+	dashboard.logoRawHtml = config.LogoRawHtml
 	dashboard.logoRedirectURL = config.LogoRedirectURL
 	dashboard.loginURL = config.LoginURL
 	dashboard.registerURL = config.RegisterURL

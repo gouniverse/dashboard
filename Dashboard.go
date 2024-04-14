@@ -42,8 +42,12 @@ type Dashboard struct {
 	content string
 
 	// Optional. The URL of the favicon (base64 encoded can be used, default will be used otherwise)
-	faviconURL      string
-	logoImageURL    string
+	faviconURL string
+
+	// Optional. The URL of the logo (base64 encoded can be used, default will be used otherwise)
+	logoImageURL string
+	// Optional. Raw HTML of the logo, if set will be used instead of logoImageURL
+	logoRawHtml     string
 	logoRedirectURL string
 	scripts         []string
 	scriptURLs      []string
@@ -285,7 +289,8 @@ func (d *Dashboard) DashboardLayoutMenu() string {
 func (d *Dashboard) topNavigation() string {
 	isNavbarBackgroundDark := lo.Ternary(d.navbarBackgroundColorMode == "light", false, true)
 
-	hasLogo := lo.Ternary(d.logoImageURL != "", true, false)
+	hasLogoImage := lo.Ternary(d.logoImageURL != "", true, false)
+	hasLogoRawHTML := lo.Ternary(d.logoRawHtml != "", true, false)
 	logoRedirectURL := lo.Ternary(d.logoRedirectURL != "", d.logoRedirectURL, "#")
 
 	navbarTheme := lo.
@@ -397,20 +402,23 @@ func (d *Dashboard) topNavigation() string {
 		mainMenu = buttonMenuToggle
 	}
 
-	logo := hb.NewHyperlink().
+	logo := lo.
+		If(hasLogoRawHTML, hb.NewHTML(d.logoRawHtml)).
+		ElseIf(hasLogoImage, hb.NewImage().
+			Src(d.logoImageURL).
+			Style("max-height:35px;")).
+		Else(nil)
+
+	logoLink := hb.NewHyperlink().
 		Href(logoRedirectURL).
 		Class("navbar-brand").
-		Child(
-			hb.NewImage().
-				Src(d.logoImageURL).
-				Style("max-height:35px;"),
-		)
+		Child(logo)
 
 	toolbar := hb.NewNav().
 		ID("Toolbar").
 		Class("navbar "+navbarTheme).
 		Style("z-index: 3;box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);transition: all .2s ease;padding-left: 20px;padding-right: 20px; display:block;").
-		ChildIf(hasLogo, logo).
+		ChildIf(hasLogoImage, logoLink).
 		Children([]*hb.Tag{
 			mainMenu,
 			// User Menu
