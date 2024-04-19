@@ -291,6 +291,7 @@ func (d *Dashboard) topNavigation() string {
 
 	hasLogoImage := lo.Ternary(d.logoImageURL != "", true, false)
 	hasLogoRawHTML := lo.Ternary(d.logoRawHtml != "", true, false)
+	hasLogo := hasLogoImage || hasLogoRawHTML
 	logoRedirectURL := lo.Ternary(d.logoRedirectURL != "", d.logoRedirectURL, "#")
 
 	navbarTheme := lo.
@@ -418,7 +419,7 @@ func (d *Dashboard) topNavigation() string {
 		ID("Toolbar").
 		Class("navbar "+navbarTheme).
 		Style("z-index: 3;box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);transition: all .2s ease;padding-left: 20px;padding-right: 20px; display:block;").
-		ChildIf(hasLogoImage, logoLink).
+		ChildIf(hasLogo, logoLink).
 		Children([]*hb.Tag{
 			mainMenu,
 			// User Menu
