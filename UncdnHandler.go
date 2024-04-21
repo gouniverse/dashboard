@@ -27,12 +27,12 @@ func UncdnHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if extension == "js" {
-		responses.GzipJSResponse(w, r, c.compileJS(w, required))
+		responses.GzipJSResponse(w, r, c.compileJS(required))
 		return
 	}
 
 	if extension == "css" {
-		responses.GzipCSSResponse(w, r, c.compileCSS(w, required))
+		responses.GzipCSSResponse(w, r, c.compileCSS(required))
 		return
 	}
 
@@ -41,7 +41,7 @@ func UncdnHandler(w http.ResponseWriter, r *http.Request) {
 
 type cdnController struct{}
 
-func (c cdnController) compileJS(w http.ResponseWriter, required []string) string {
+func (c cdnController) compileJS(required []string) string {
 	js := []string{}
 	lo.ForEach(required, func(item string, index int) {
 		js = append(js, findJS(item))
@@ -49,7 +49,7 @@ func (c cdnController) compileJS(w http.ResponseWriter, required []string) strin
 	return strings.Join(js, "\n;\n")
 }
 
-func (c cdnController) compileCSS(w http.ResponseWriter, required []string) string {
+func (c cdnController) compileCSS(required []string) string {
 	css := []string{}
 	lo.ForEach(required, func(item string, index int) {
 		css = append(css, c.findCss(item))

@@ -199,6 +199,7 @@ func buildSubmenuItem(menuItem MenuItem, index int) *hb.Tag {
 	}
 
 	link := hb.NewHyperlink().Class("nav-link px-0")
+
 	if icon != "" {
 		link.Child(hb.NewSpan().
 			Class("icon").

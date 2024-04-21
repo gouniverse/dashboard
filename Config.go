@@ -50,6 +50,9 @@ type Config struct {
 	// Optional. The theme to be activated on the dashboard (default will be used otherwise)
 	Theme string
 
+	// Optional. Sets the default theme (THEME_DEFAULT will be used otherwise)
+	// ThemeDefault string
+
 	// Optional. The URL of the theme switcher endpoint to use
 	ThemeHandlerUrl string
 
