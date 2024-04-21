@@ -165,6 +165,7 @@ func (d *Dashboard) ToHTML() string {
 	}
 
 	menu := d.menuOffcanvas().ToHTML()
+
 	if d.menuType == MENU_TYPE_MODAL {
 		menu += d.menuModal().ToHTML()
 	}
@@ -295,31 +296,25 @@ func (d *Dashboard) DashboardLayoutMenu() string {
 func (d *Dashboard) topNavigation() string {
 	hasNavbarBackgroundColor := lo.Ternary(d.navbarBackgroundColor == "", false, true)
 	hasNavbarTextColor := lo.Ternary(d.navbarTextColor == "", false, true)
-	hasNavbarBackgroundTheme := lo.Ternary(!hasNavbarBackgroundColor && d.navbarBackgroundColorMode != "", true, false)
 
 	hasLogoImage := lo.Ternary(d.logoImageURL != "", true, false)
 	hasLogoRawHTML := lo.Ternary(d.logoRawHtml != "", true, false)
 	hasLogo := hasLogoImage || hasLogoRawHTML
 	logoRedirectURL := lo.Ternary(d.logoRedirectURL != "", d.logoRedirectURL, "#")
 
-	navbarThemeBackgroundClass := lo.
-		If(hasNavbarBackgroundTheme, "bg-"+d.navbarBackgroundColorMode).
-		// ElseIf(!hasNavbarBackgroundTheme && !hasNavbarBackgroundColor, "bg-dark").
-		Else("")
-
-	buttonTheme := lo.
-		If(hasNavbarBackgroundTheme, "btn-"+d.navbarBackgroundColorMode).
-		Else("")
+	navbarThemeBackgroundClass := d.navbarBackgroundThemeClass()
 
 	iconStyle := "margin-top:-4px;margin-right:5px;"
 
-	dropdownUser := d.navbarDropdownUser(buttonTheme, iconStyle)
-	dropdownQuickAccess := d.navbarDropdownQuickAccess(buttonTheme, iconStyle)
-	dropdownThemeSwitch := d.navbarDropdownThemeSwitch(buttonTheme)
+	dropdownUser := d.navbarDropdownUser(iconStyle)
+	dropdownQuickAccess := d.navbarDropdownQuickAccess(iconStyle)
+	dropdownThemeSwitch := d.navbarDropdownThemeSwitch()
+
+	buttonTheme := d.navbarButtonThemeClass()
 
 	buttonMenuToggle := hb.NewButton().
 		Class("btn "+buttonTheme).
-		Style("background: none;").
+		Style("background: none; border:none;").
 		StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
 		Data("bs-toggle", "modal").
 		Data("bs-target", "#ModalDashboardMenu").
@@ -330,7 +325,7 @@ func (d *Dashboard) topNavigation() string {
 
 	buttonOffcanvasToggle := hb.NewButton().
 		Class("btn "+buttonTheme).
-		Style("background: none;").
+		Style("background: none; border:none;").
 		StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
 		Data("bs-toggle", "offcanvas").
 		Data("bs-target", "#OffcanvasMenu").
@@ -356,10 +351,24 @@ func (d *Dashboard) topNavigation() string {
 		Class("navbar-brand").
 		Child(logo)
 
+	loginLink := hb.NewHyperlink().
+		Text("Login").
+		Href(d.loginURL).
+		Class("btn "+buttonTheme+" float-end").
+		StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
+		Style("margin-left:10px;  border:none;")
+
+	registerLink := hb.NewHyperlink().
+		Text("Register").
+		Href(d.registerURL).
+		Class("btn "+buttonTheme+" float-end").
+		StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
+		Style("margin-left:10px;  border:none;")
+
 	toolbar := hb.NewNav().
 		ID("Toolbar").
 		Class("navbar").
-		ClassIf(hasNavbarBackgroundTheme, navbarThemeBackgroundClass).
+		ClassIf(d.navbarHasBackgroundThemeClass(), navbarThemeBackgroundClass).
 		Style("z-index: 3;box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);transition: all .2s ease;padding-left: 20px;padding-right: 20px; display:block;").
 		StyleIf(hasNavbarBackgroundColor, `background-color: `+d.navbarBackgroundColor+`;`).
 		StyleIf(hasNavbarTextColor, `color: `+d.navbarTextColor+`;`).
@@ -376,22 +385,12 @@ func (d *Dashboard) topNavigation() string {
 
 			// Register Link
 			hb.If(lo.IsEmpty(d.user) && d.registerURL != "",
-				hb.NewHyperlink().
-					Text("Register").
-					Href(d.registerURL).
-					Class("btn "+buttonTheme+" float-end").
-					StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
-					Style("margin-left:10px;"),
+				registerLink,
 			),
 
 			// Login Link
 			hb.If(lo.IsEmpty(d.user) && d.loginURL != "",
-				hb.NewHyperlink().
-					Text("Login").
-					Href(d.loginURL).
-					Class("btn "+buttonTheme+" float-end").
-					StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
-					Style("margin-left:10px;"),
+				loginLink,
 			),
 
 			// Theme Switcher
@@ -411,95 +410,6 @@ func (d *Dashboard) topNavigation() string {
 	return toolbar.ToHTML()
 }
 
-func (d *Dashboard) navbarDropdownQuickAccess(buttonTheme string, iconStyle string) *hb.Tag {
-	hasNavbarTextColor := lo.Ternary(d.navbarTextColor == "", false, true)
-
-	dropdownQuickAccess := hb.NewDiv().
-		Class("dropdown").
-		Children([]*hb.Tag{
-			hb.NewButton().
-				ID("ButtonUser").
-				Class("btn "+buttonTheme+" dropdown-toggle").
-				Style("background:none;border:0px;").
-				StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
-				Type(hb.TYPE_BUTTON).
-				Data("bs-toggle", "dropdown").
-				Children([]*hb.Tag{
-					icons.Icon("bi-microsoft", 24, 24, "").
-						Style(iconStyle).
-						Style("margin-top:-4px;margin-right:8px;"),
-					hb.NewSpan().Text("Quick Access").Style("margin-right:10px;"),
-				}),
-			hb.NewUL().
-				Class("dropdown-menu").
-				Children(lo.Map(d.quickAccessMenu, func(item MenuItem, _ int) *hb.Tag {
-					target := lo.Ternary(item.Target == "", "_self", item.Target)
-					url := lo.Ternary(item.URL == "", "#", item.URL)
-
-					return hb.NewLI().Children([]*hb.Tag{
-						hb.If(item.Title == "",
-							hb.NewHR().
-								Class("dropdown-divider"),
-						),
-
-						hb.If(item.Title != "",
-							hb.NewHyperlink().
-								Class("dropdown-item").
-								ChildIf(item.Icon != "", hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(item.Icon)).
-								Text(item.Title).
-								Href(url).
-								Target(target),
-						),
-					})
-				})),
-		})
-	return dropdownQuickAccess
-}
-
-func (d *Dashboard) navbarDropdownUser(buttonTheme string, iconStyle string) *hb.Tag {
-	hasNavbarTextColor := lo.Ternary(d.navbarTextColor == "", false, true)
-
-	dropdownUser := hb.NewDiv().Class("dropdown").
-		Children([]*hb.Tag{
-			hb.NewButton().
-				ID("ButtonUser").
-				Class("btn "+buttonTheme+" dropdown-toggle").
-				Style("background:none;border:0px;").
-				StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
-				Type(hb.TYPE_BUTTON).
-				Data("bs-toggle", "dropdown").
-				Children([]*hb.Tag{
-					icons.Icon("bi-person", 24, 24, "").Style(iconStyle),
-					hb.NewSpan().
-						Text(d.user.FirstName + " " + d.user.LastName).
-						Style("margin-right:10px;"),
-				}),
-			hb.NewUL().
-				Class("dropdown-menu").
-				Children(lo.Map(d.userMenu, func(item MenuItem, _ int) *hb.Tag {
-					target := lo.Ternary(item.Target == "", "_self", item.Target)
-					url := lo.Ternary(item.URL == "", "#", item.URL)
-
-					return hb.NewLI().Children([]*hb.Tag{
-						hb.If(item.Title == "",
-							hb.NewHR().
-								Class("dropdown-divider"),
-						),
-
-						hb.If(item.Title != "",
-							hb.NewHyperlink().
-								Class("dropdown-item").
-								ChildIf(item.Icon != "", hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(item.Icon)).
-								Text(item.Title).
-								Href(url).
-								Target(target),
-						),
-					})
-				})),
-		})
-	return dropdownUser
-}
-
 func (d *Dashboard) center(content string) string {
 	contentHolder := hb.NewDiv().Class("shadow p-3 m-3").HTML(content)
 	html := contentHolder.ToHTML()
@@ -507,9 +417,13 @@ func (d *Dashboard) center(content string) string {
 }
 
 func (d *Dashboard) menuOffcanvas() *hb.Tag {
+	backgroundClass := d.navbarBackgroundThemeClass()
+
 	offcanvasMenu := hb.NewDiv().
 		ID("OffcanvasMenu").
-		Class("offcanvas offcanvas-start text-bg-dark").
+		Class("offcanvas offcanvas-start").
+		Class(backgroundClass).
+		ClassIfElse(backgroundClass == "bg-light", "text-bg-light", "text-bg-dark").
 		Attr("tabindex", "-1").
 		Children([]*hb.Tag{
 			hb.NewDiv().Class("offcanvas-header").
@@ -519,6 +433,7 @@ func (d *Dashboard) menuOffcanvas() *hb.Tag {
 						Text("Menu"),
 					hb.NewButton().
 						Class("btn-close btn-close-white").
+						ClassIf(backgroundClass == "bg-light", "text-bg-light").
 						Type(hb.TYPE_BUTTON).
 						Data("bs-dismiss", "offcanvas").
 						Attr("aria-label", "Close"),
@@ -635,13 +550,82 @@ func (d *Dashboard) isThemeDark() bool {
 	return isDark
 }
 
+func (d *Dashboard) navbarHasBackgroundThemeClass() bool {
+	hasNavbarBackgroundColor := lo.Ternary(d.navbarBackgroundColor == "", false, true)
+	hasNavbarBackgroundTheme := lo.Ternary(!hasNavbarBackgroundColor && d.navbarBackgroundColorMode != "", true, false)
+	return hasNavbarBackgroundTheme
+}
+
+func (d *Dashboard) navbarBackgroundThemeClass() string {
+	navbarThemeBackgroundClass := lo.
+		If(d.navbarHasBackgroundThemeClass(), "bg-"+d.navbarBackgroundColorMode).
+		// ElseIf(!hasNavbarBackgroundTheme && !hasNavbarBackgroundColor, "bg-dark").
+		Else("")
+
+	return navbarThemeBackgroundClass
+}
+
+func (d *Dashboard) navbarButtonThemeClass() string {
+	buttonTheme := lo.
+		If(d.navbarHasBackgroundThemeClass(), "btn-"+d.navbarBackgroundColorMode).
+		Else("")
+	return buttonTheme
+}
+
+func (d *Dashboard) navbarDropdownQuickAccess(iconStyle string) *hb.Tag {
+	hasNavbarTextColor := lo.Ternary(d.navbarTextColor == "", false, true)
+	buttonTheme := d.navbarButtonThemeClass()
+
+	dropdownQuickAccess := hb.NewDiv().
+		Class("dropdown").
+		Children([]*hb.Tag{
+			hb.NewButton().
+				ID("ButtonUser").
+				Class("btn "+buttonTheme+" dropdown-toggle").
+				Style("background:none;border:0px;").
+				StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
+				Type(hb.TYPE_BUTTON).
+				Data("bs-toggle", "dropdown").
+				Children([]*hb.Tag{
+					icons.Icon("bi-microsoft", 24, 24, "").
+						Style(iconStyle).
+						Style("margin-top:-4px;margin-right:8px;"),
+					hb.NewSpan().Text("Quick Access").Style("margin-right:10px;"),
+				}),
+			hb.NewUL().
+				Class("dropdown-menu").
+				Children(lo.Map(d.quickAccessMenu, func(item MenuItem, _ int) *hb.Tag {
+					target := lo.Ternary(item.Target == "", "_self", item.Target)
+					url := lo.Ternary(item.URL == "", "#", item.URL)
+
+					return hb.NewLI().Children([]*hb.Tag{
+						hb.If(item.Title == "",
+							hb.NewHR().
+								Class("dropdown-divider"),
+						),
+
+						hb.If(item.Title != "",
+							hb.NewHyperlink().
+								Class("dropdown-item").
+								ChildIf(item.Icon != "", hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(item.Icon)).
+								Text(item.Title).
+								Href(url).
+								Target(target),
+						),
+					})
+				})),
+		})
+	return dropdownQuickAccess
+}
+
 // themeButton generates a dropdown menu with light and dark themes.
 //
 // It checks if the current theme is dark and creates dropdown items for both light and dark themes.
 // The dropdown items are created dynamically based on the themesLight and themesDark maps.
 // The function returns a *hb.Tag that represents the generated dropdown menu.
-func (d *Dashboard) navbarDropdownThemeSwitch(buttonTheme string) *hb.Tag {
+func (d *Dashboard) navbarDropdownThemeSwitch() *hb.Tag {
 	hasNavbarTextColor := lo.Ternary(d.navbarTextColor == "", false, true)
+	buttonTheme := d.navbarButtonThemeClass()
 
 	isDark := d.isThemeDark()
 
@@ -693,23 +677,74 @@ func (d *Dashboard) navbarDropdownThemeSwitch(buttonTheme string) *hb.Tag {
 		})
 	})
 
-	return hb.NewDiv().Class("dropdown").Children([]*hb.Tag{
-		bs.Button().
-			ID("buttonTheme").
-			Class(buttonTheme+" dropdown-toggle").
-			StyleIf(hasNavbarTextColor, "color:"+d.navbarTextColor).
-			Data("bs-toggle", "dropdown").
-			Children([]*hb.Tag{
-				lo.Ternary(isDark, hb.NewI().Class("bi bi-sun"), hb.NewI().Class("bi bi-moon-stars-fill")),
-			}),
-		hb.NewUL().Class(buttonTheme+" dropdown-menu dropdown-menu-dark").
-			Children(lightDropdownItems).
-			ChildIf(
-				len(lo.Filter(darkDropdownItems, func(item *hb.Tag, _ int) bool { return item != nil })) > 0 && len(lo.Filter(lightDropdownItems, func(item *hb.Tag, _ int) bool { return item != nil })) > 0,
-				hb.NewLI().Children([]*hb.Tag{
-					hb.NewHR().Class("dropdown-divider"),
+	return hb.NewDiv().
+		Class("dropdown").
+		Children([]*hb.Tag{
+			bs.Button().
+				ID("buttonTheme").
+				Class(buttonTheme+" dropdown-toggle").
+				Style("background:none;border:0px;").
+				StyleIf(hasNavbarTextColor, "color:"+d.navbarTextColor).
+				Data("bs-toggle", "dropdown").
+				Children([]*hb.Tag{
+					lo.Ternary(isDark, hb.NewI().Class("bi bi-sun"), hb.NewI().Class("bi bi-moon-stars-fill")),
 				}),
-			).
-			Children(darkDropdownItems),
-	})
+			hb.NewUL().Class(buttonTheme+" dropdown-menu dropdown-menu-dark").
+				Children(lightDropdownItems).
+				ChildIf(
+					len(lo.Filter(darkDropdownItems, func(item *hb.Tag, _ int) bool { return item != nil })) > 0 && len(lo.Filter(lightDropdownItems, func(item *hb.Tag, _ int) bool { return item != nil })) > 0,
+					hb.NewLI().Children([]*hb.Tag{
+						hb.NewHR().Class("dropdown-divider"),
+					}),
+				).
+				Children(darkDropdownItems),
+		})
+}
+
+func (d *Dashboard) navbarDropdownUser(iconStyle string) *hb.Tag {
+	hasNavbarTextColor := lo.Ternary(d.navbarTextColor == "", false, true)
+	buttonTheme := d.navbarButtonThemeClass()
+
+	dropdownUser := hb.NewDiv().
+		Class("dropdown").
+		Children([]*hb.Tag{
+			hb.NewButton().
+				ID("ButtonUser").
+				Class("btn "+buttonTheme+" dropdown-toggle").
+				Style("background:none;border:0px;").
+				StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
+				Type(hb.TYPE_BUTTON).
+				Data("bs-toggle", "dropdown").
+				Children([]*hb.Tag{
+					icons.Icon("bi-person", 24, 24, "").Style(iconStyle),
+					hb.NewSpan().
+						Text(d.user.FirstName + " " + d.user.LastName).
+						Style("margin-right:10px;"),
+				}),
+			hb.NewUL().
+				Class("dropdown-menu dropdown-menu-dark").
+				Class(buttonTheme).
+				Children(lo.Map(d.userMenu, func(item MenuItem, _ int) *hb.Tag {
+					target := lo.Ternary(item.Target == "", "_self", item.Target)
+					url := lo.Ternary(item.URL == "", "#", item.URL)
+
+					return hb.NewLI().Children([]*hb.Tag{
+						hb.If(item.Title == "",
+							hb.NewHR().
+								Class("dropdown-divider"),
+						),
+
+						hb.If(item.Title != "",
+							hb.NewHyperlink().
+								Class("dropdown-item").
+								ChildIf(item.Icon != "", hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(item.Icon)).
+								Text(item.Title).
+								Href(url).
+								Target(target),
+						),
+					})
+				})),
+		})
+
+	return dropdownUser
 }
