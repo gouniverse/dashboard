@@ -23,8 +23,14 @@ type Config struct {
 	// Optional. The redirect URL of the logo image
 	LogoRedirectURL string
 
-	// Optional The background color for the navbar, light or dark (default)
+	// Optional The background color for the navbar: light, dark (default),  primary, secondary, success, warning, info, danger
 	NavbarBackgroundColorMode string
+
+	// Optional. The background color for the navbar (default none)
+	NavbarBackgroundColor string
+
+	// Optional. The text color for the navbar (default light)
+	NavbarTextColor string
 
 	// Optional. The URL of the login page to use (if user is not provided)
 	LoginURL string

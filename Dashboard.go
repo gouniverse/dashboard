@@ -26,6 +26,12 @@ type Dashboard struct {
 	// Optional. The background color for the navbar, light or dark (default)
 	navbarBackgroundColorMode string
 
+	// Optional. The background color for the navbar (default dark)
+	navbarBackgroundColor string
+
+	// Optional. The text color for the navbar (default light)
+	navbarTextColor string
+
 	// Optional. The URL of the login page to use (if user is not provided)
 	loginURL string
 
@@ -287,22 +293,171 @@ func (d *Dashboard) DashboardLayoutMenu() string {
 // No parameters.
 // Returns a string.
 func (d *Dashboard) topNavigation() string {
-	isNavbarBackgroundDark := lo.Ternary(d.navbarBackgroundColorMode == "light", false, true)
+	hasNavbarBackgroundColor := lo.Ternary(d.navbarBackgroundColor == "", false, true)
+	hasNavbarTextColor := lo.Ternary(d.navbarTextColor == "", false, true)
+	hasNavbarBackgroundTheme := lo.Ternary(!hasNavbarBackgroundColor && d.navbarBackgroundColorMode != "", true, false)
 
 	hasLogoImage := lo.Ternary(d.logoImageURL != "", true, false)
 	hasLogoRawHTML := lo.Ternary(d.logoRawHtml != "", true, false)
 	hasLogo := hasLogoImage || hasLogoRawHTML
 	logoRedirectURL := lo.Ternary(d.logoRedirectURL != "", d.logoRedirectURL, "#")
 
-	navbarTheme := lo.
-		If(isNavbarBackgroundDark, "bg-dark text-bg-dark").
-		Else("bg-light text-bg-light")
+	navbarThemeBackgroundClass := lo.
+		If(hasNavbarBackgroundTheme, "bg-"+d.navbarBackgroundColorMode).
+		// ElseIf(!hasNavbarBackgroundTheme && !hasNavbarBackgroundColor, "bg-dark").
+		Else("")
 
 	buttonTheme := lo.
-		If(isNavbarBackgroundDark, "btn-dark").
-		Else("btn-light")
+		If(hasNavbarBackgroundTheme, "btn-"+d.navbarBackgroundColorMode).
+		Else("")
 
 	iconStyle := "margin-top:-4px;margin-right:5px;"
+
+	dropdownUser := d.navbarDropdownUser(buttonTheme, iconStyle)
+	dropdownQuickAccess := d.navbarDropdownQuickAccess(buttonTheme, iconStyle)
+	dropdownThemeSwitch := d.navbarDropdownThemeSwitch(buttonTheme)
+
+	buttonMenuToggle := hb.NewButton().
+		Class("btn "+buttonTheme).
+		Style("background: none;").
+		StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
+		Data("bs-toggle", "modal").
+		Data("bs-target", "#ModalDashboardMenu").
+		Children([]*hb.Tag{
+			icons.Icon("bi-list", 24, 24, "").Style(iconStyle),
+			hb.NewSpan().HTML("Menu"),
+		})
+
+	buttonOffcanvasToggle := hb.NewButton().
+		Class("btn "+buttonTheme).
+		Style("background: none;").
+		StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
+		Data("bs-toggle", "offcanvas").
+		Data("bs-target", "#OffcanvasMenu").
+		Children([]*hb.Tag{
+			icons.Icon("bi-list", 24, 24, "").Style(iconStyle),
+			hb.NewSpan().HTML("Menu"),
+		})
+
+	mainMenu := buttonOffcanvasToggle
+	if d.menuType == MENU_TYPE_MODAL {
+		mainMenu = buttonMenuToggle
+	}
+
+	logo := lo.
+		If(hasLogoRawHTML, hb.NewHTML(d.logoRawHtml)).
+		ElseIf(hasLogoImage, hb.NewImage().
+			Src(d.logoImageURL).
+			Style("max-height:35px;")).
+		Else(nil)
+
+	logoLink := hb.NewHyperlink().
+		Href(logoRedirectURL).
+		Class("navbar-brand").
+		Child(logo)
+
+	toolbar := hb.NewNav().
+		ID("Toolbar").
+		Class("navbar").
+		ClassIf(hasNavbarBackgroundTheme, navbarThemeBackgroundClass).
+		Style("z-index: 3;box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);transition: all .2s ease;padding-left: 20px;padding-right: 20px; display:block;").
+		StyleIf(hasNavbarBackgroundColor, `background-color: `+d.navbarBackgroundColor+`;`).
+		StyleIf(hasNavbarTextColor, `color: `+d.navbarTextColor+`;`).
+		ChildIf(hasLogo, logoLink).
+		Children([]*hb.Tag{
+			mainMenu,
+
+			// User Menu
+			hb.If(!lo.IsEmpty(d.user) && (d.user.FirstName != "" || d.user.LastName != ""),
+				hb.NewDiv().Class("float-end").
+					Style("margin-left:10px;").
+					Child(dropdownUser),
+			),
+
+			// Register Link
+			hb.If(lo.IsEmpty(d.user) && d.registerURL != "",
+				hb.NewHyperlink().
+					Text("Register").
+					Href(d.registerURL).
+					Class("btn "+buttonTheme+" float-end").
+					StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
+					Style("margin-left:10px;"),
+			),
+
+			// Login Link
+			hb.If(lo.IsEmpty(d.user) && d.loginURL != "",
+				hb.NewHyperlink().
+					Text("Login").
+					Href(d.loginURL).
+					Class("btn "+buttonTheme+" float-end").
+					StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
+					Style("margin-left:10px;"),
+			),
+
+			// Theme Switcher
+			hb.If(d.themeHandlerUrl != "",
+				hb.NewDiv().Class("float-end").
+					Style("margin-left:10px;").
+					Child(dropdownThemeSwitch),
+			),
+
+			// Quick Menu (if provided)
+			hb.If(len(d.quickAccessMenu) > 0, hb.NewDiv().
+				Class("float-end").
+				Style("margin-left:10px;").
+				Child(dropdownQuickAccess)),
+		})
+
+	return toolbar.ToHTML()
+}
+
+func (d *Dashboard) navbarDropdownQuickAccess(buttonTheme string, iconStyle string) *hb.Tag {
+	hasNavbarTextColor := lo.Ternary(d.navbarTextColor == "", false, true)
+
+	dropdownQuickAccess := hb.NewDiv().
+		Class("dropdown").
+		Children([]*hb.Tag{
+			hb.NewButton().
+				ID("ButtonUser").
+				Class("btn "+buttonTheme+" dropdown-toggle").
+				Style("background:none;border:0px;").
+				StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
+				Type(hb.TYPE_BUTTON).
+				Data("bs-toggle", "dropdown").
+				Children([]*hb.Tag{
+					icons.Icon("bi-microsoft", 24, 24, "").
+						Style(iconStyle).
+						Style("margin-top:-4px;margin-right:8px;"),
+					hb.NewSpan().Text("Quick Access").Style("margin-right:10px;"),
+				}),
+			hb.NewUL().
+				Class("dropdown-menu").
+				Children(lo.Map(d.quickAccessMenu, func(item MenuItem, _ int) *hb.Tag {
+					target := lo.Ternary(item.Target == "", "_self", item.Target)
+					url := lo.Ternary(item.URL == "", "#", item.URL)
+
+					return hb.NewLI().Children([]*hb.Tag{
+						hb.If(item.Title == "",
+							hb.NewHR().
+								Class("dropdown-divider"),
+						),
+
+						hb.If(item.Title != "",
+							hb.NewHyperlink().
+								Class("dropdown-item").
+								ChildIf(item.Icon != "", hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(item.Icon)).
+								Text(item.Title).
+								Href(url).
+								Target(target),
+						),
+					})
+				})),
+		})
+	return dropdownQuickAccess
+}
+
+func (d *Dashboard) navbarDropdownUser(buttonTheme string, iconStyle string) *hb.Tag {
+	hasNavbarTextColor := lo.Ternary(d.navbarTextColor == "", false, true)
 
 	dropdownUser := hb.NewDiv().Class("dropdown").
 		Children([]*hb.Tag{
@@ -310,6 +465,7 @@ func (d *Dashboard) topNavigation() string {
 				ID("ButtonUser").
 				Class("btn "+buttonTheme+" dropdown-toggle").
 				Style("background:none;border:0px;").
+				StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
 				Type(hb.TYPE_BUTTON).
 				Data("bs-toggle", "dropdown").
 				Children([]*hb.Tag{
@@ -341,127 +497,7 @@ func (d *Dashboard) topNavigation() string {
 					})
 				})),
 		})
-
-	dropdownQuickAccess := hb.NewDiv().Class("dropdown").
-		Children([]*hb.Tag{
-			hb.NewButton().
-				ID("ButtonUser").
-				Class("btn "+buttonTheme+" dropdown-toggle").
-				Style("background:none;border:0px;").
-				Type(hb.TYPE_BUTTON).
-				Data("bs-toggle", "dropdown").
-				Children([]*hb.Tag{
-					icons.Icon("bi-microsoft", 24, 24, "").Style("margin-top:-4px;margin-right:8px;"),
-					hb.NewSpan().Text("Quick Access").Style("margin-right:10px;"),
-				}),
-			hb.NewUL().
-				Class("dropdown-menu").
-				Children(lo.Map(d.quickAccessMenu, func(item MenuItem, _ int) *hb.Tag {
-					target := lo.Ternary(item.Target == "", "_self", item.Target)
-					url := lo.Ternary(item.URL == "", "#", item.URL)
-
-					return hb.NewLI().Children([]*hb.Tag{
-						hb.If(item.Title == "",
-							hb.NewHR().
-								Class("dropdown-divider"),
-						),
-
-						hb.If(item.Title != "",
-							hb.NewHyperlink().
-								Class("dropdown-item").
-								ChildIf(item.Icon != "", hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(item.Icon)).
-								Text(item.Title).
-								Href(url).
-								Target(target),
-						),
-					})
-				})),
-		})
-
-	buttonMenuToggle := hb.NewButton().
-		Class("btn "+buttonTheme).
-		Style("background: none;").
-		Data("bs-toggle", "modal").
-		Data("bs-target", "#ModalDashboardMenu").
-		Children([]*hb.Tag{
-			icons.Icon("bi-list", 24, 24, "").Style(iconStyle),
-			hb.NewSpan().HTML("Menu"),
-		})
-
-	buttonOffcanvasToggle := hb.NewButton().
-		Class("btn "+buttonTheme).
-		Style("background: none;").
-		Data("bs-toggle", "offcanvas").
-		Data("bs-target", "#OffcanvasMenu").
-		Children([]*hb.Tag{
-			icons.Icon("bi-list", 24, 24, "").Style(iconStyle),
-			hb.NewSpan().HTML("Menu"),
-		})
-
-	mainMenu := buttonOffcanvasToggle
-	if d.menuType == MENU_TYPE_MODAL {
-		mainMenu = buttonMenuToggle
-	}
-
-	logo := lo.
-		If(hasLogoRawHTML, hb.NewHTML(d.logoRawHtml)).
-		ElseIf(hasLogoImage, hb.NewImage().
-			Src(d.logoImageURL).
-			Style("max-height:35px;")).
-		Else(nil)
-
-	logoLink := hb.NewHyperlink().
-		Href(logoRedirectURL).
-		Class("navbar-brand").
-		Child(logo)
-
-	toolbar := hb.NewNav().
-		ID("Toolbar").
-		Class("navbar "+navbarTheme).
-		Style("z-index: 3;box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);transition: all .2s ease;padding-left: 20px;padding-right: 20px; display:block;").
-		ChildIf(hasLogo, logoLink).
-		Children([]*hb.Tag{
-			mainMenu,
-			// User Menu
-			hb.If(!lo.IsEmpty(d.user) && (d.user.FirstName != "" || d.user.LastName != ""),
-				hb.NewDiv().Class("float-end").
-					Style("margin-left:10px;").
-					Child(dropdownUser),
-			),
-
-			// Register Link
-			hb.If(lo.IsEmpty(d.user) && d.registerURL != "",
-				hb.NewHyperlink().
-					Text("Register").
-					Href(d.registerURL).
-					Class("btn "+buttonTheme+" float-end").
-					Style("margin-left:10px;"),
-			),
-
-			// Login Link
-			hb.If(lo.IsEmpty(d.user) && d.loginURL != "",
-				hb.NewHyperlink().
-					Text("Login").
-					Href(d.loginURL).
-					Class("btn "+buttonTheme+" float-end").
-					Style("margin-left:10px;"),
-			),
-
-			// Theme Switcher
-			hb.If(d.themeHandlerUrl != "",
-				hb.NewDiv().Class("float-end").
-					Style("margin-left:10px;").
-					Child(d.themeButton()),
-			),
-
-			// Quick Menu (if provided)
-			hb.If(len(d.quickAccessMenu) > 0, hb.NewDiv().
-				Class("float-end").
-				Style("margin-left:10px;").
-				Child(dropdownQuickAccess)),
-		})
-
-	return toolbar.ToHTML()
+	return dropdownUser
 }
 
 func (d *Dashboard) center(content string) string {
@@ -604,13 +640,10 @@ func (d *Dashboard) isThemeDark() bool {
 // It checks if the current theme is dark and creates dropdown items for both light and dark themes.
 // The dropdown items are created dynamically based on the themesLight and themesDark maps.
 // The function returns a *hb.Tag that represents the generated dropdown menu.
-func (d *Dashboard) themeButton() *hb.Tag {
-	isDark := d.isThemeDark()
-	isNavbarBackgroundDark := lo.Ternary(d.navbarBackgroundColorMode == "light", false, true)
+func (d *Dashboard) navbarDropdownThemeSwitch(buttonTheme string) *hb.Tag {
+	hasNavbarTextColor := lo.Ternary(d.navbarTextColor == "", false, true)
 
-	buttonTheme := lo.
-		If(isNavbarBackgroundDark, "btn-dark").
-		Else("btn-light")
+	isDark := d.isThemeDark()
 
 	// Light Themes
 	lightDropdownItems := lo.Map(lo.Keys(themesLight), func(theme string, index int) *hb.Tag {
@@ -664,6 +697,7 @@ func (d *Dashboard) themeButton() *hb.Tag {
 		bs.Button().
 			ID("buttonTheme").
 			Class(buttonTheme+" dropdown-toggle").
+			StyleIf(hasNavbarTextColor, "color:"+d.navbarTextColor).
 			Data("bs-toggle", "dropdown").
 			Children([]*hb.Tag{
 				lo.Ternary(isDark, hb.NewI().Class("bi bi-sun"), hb.NewI().Class("bi bi-moon-stars-fill")),

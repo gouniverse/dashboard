@@ -12,10 +12,6 @@ func NewDashboard(config Config) *Dashboard {
 		config.Theme = ThemeNameRetrieveFromCookie(config.HTTPRequest)
 	}
 
-	if config.NavbarBackgroundColorMode == "" {
-		config.NavbarBackgroundColorMode = "dark"
-	}
-
 	config.Theme = themeNameVerifyAndFix(config.Theme)
 
 	dashboard := &Dashboard{}
@@ -28,6 +24,8 @@ func NewDashboard(config Config) *Dashboard {
 	dashboard.loginURL = config.LoginURL
 	dashboard.registerURL = config.RegisterURL
 	dashboard.navbarBackgroundColorMode = config.NavbarBackgroundColorMode
+	dashboard.navbarBackgroundColor = config.NavbarBackgroundColor
+	dashboard.navbarTextColor = config.NavbarTextColor
 	dashboard.scripts = config.Scripts
 	dashboard.scriptURLs = config.ScriptURLs
 	dashboard.styles = config.Styles
