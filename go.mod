@@ -5,7 +5,7 @@ go 1.22.4
 toolchain go1.22.5
 
 require (
-	github.com/gouniverse/bs v0.10.1
+	github.com/gouniverse/bs v0.11.1
 	github.com/gouniverse/cdn v1.5.0
 	github.com/gouniverse/hb v1.74.0
 	github.com/gouniverse/icons v1.3.1
