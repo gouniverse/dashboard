@@ -11,7 +11,7 @@ import (
 
 func main() {
 	log.Println("1. Initializing environment variables...")
-	utils.EnvInitialize()
+	utils.EnvInitialize(".env")
 
 	// log.Println("3. Initializing Dashboard...")
 
