@@ -78,8 +78,8 @@ type Dashboard struct {
 func (d *Dashboard) layout() string {
 	content := d.content
 	layout := hb.NewBorderLayout()
-	layout.AddTop(hb.NewHTML(d.topNavigation()), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_MIDDLE)
-	layout.AddCenter(hb.NewHTML(d.center(content)), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_TOP)
+	layout.AddTop(hb.Raw(d.topNavigation()), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_MIDDLE)
+	layout.AddCenter(hb.Raw(d.center(content)), hb.BORDER_LAYOUT_ALIGN_LEFT, hb.BORDER_LAYOUT_ALIGN_TOP)
 	return layout.ToHTML()
 }
 
@@ -129,7 +129,7 @@ func (d *Dashboard) ToHTML() string {
 		faviconURL = favicon()
 	}
 
-	webpage := hb.NewWebpage()
+	webpage := hb.Webpage()
 	webpage.SetTitle(d.title)
 
 	// Required Style URLs
@@ -159,7 +159,7 @@ func (d *Dashboard) ToHTML() string {
 	// webpage.AddScript(scripts(d.scripts))
 	webpage.SetFavicon(faviconURL)
 	if d.redirectUrl != "" && d.redirectTime != "" {
-		webpage.Meta(hb.NewMeta().
+		webpage.Meta(hb.Meta().
 			Attr("http-equiv", "refresh").
 			Attr("content", d.redirectTime+"; url = "+d.redirectUrl))
 	}
@@ -170,7 +170,7 @@ func (d *Dashboard) ToHTML() string {
 		menu += d.menuModal().ToHTML()
 	}
 
-	webpage.AddChild(hb.NewHTML(d.layout() + menu))
+	webpage.AddChild(hb.Raw(d.layout() + menu))
 
 	return webpage.ToHTML()
 }
@@ -198,27 +198,27 @@ func buildSubmenuItem(menuItem MenuItem, index int) *hb.Tag {
 		url = "#" + submenuId
 	}
 
-	link := hb.NewHyperlink().Class("nav-link px-0")
+	link := hb.Hyperlink().Class("nav-link px-0")
 
 	if icon != "" {
-		link.Child(hb.NewSpan().
+		link.Child(hb.Span().
 			Class("icon").
 			Style("margin-right: 5px;").
 			HTML(icon))
 	} else {
-		link.Child(hb.NewHTML(`
+		link.Child(hb.Raw(`
 		    <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
 		        <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
 		    </svg>
 		`))
 	}
-	link.Child(hb.NewSpan().Class("d-inline").HTML(title))
+	link.Child(hb.Span().Class("d-inline").HTML(title))
 	link.Href(url)
 	if hasChildren {
 		link.Data("bs-toggle", "collapse")
 	}
 
-	return hb.NewLI().
+	return hb.LI().
 		Class("w-100").
 		Child(link)
 }
@@ -240,9 +240,9 @@ func buildMenuItem(menuItem MenuItem, index int) *hb.Tag {
 		url = "#" + submenuId
 	}
 
-	link := hb.NewHyperlink().Class("nav-link align-middle px-0")
+	link := hb.Hyperlink().Class("nav-link align-middle px-0")
 	if icon != "" {
-		link.Child(hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(icon))
+		link.Child(hb.Span().Class("icon").Style("margin-right: 5px;").HTML(icon))
 	}
 	link.HTML(title)
 	link.Attr("href", url)
@@ -255,13 +255,13 @@ func buildMenuItem(menuItem MenuItem, index int) *hb.Tag {
 			<path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
 			</svg>
 		</b>`
-		link.Child(hb.NewHTML(html))
+		link.Child(hb.Raw(html))
 	}
 
-	li := hb.NewLI().Class("nav-item").Child(link)
+	li := hb.LI().Class("nav-item").Child(link)
 
 	if hasChildren {
-		ul := hb.NewUL().
+		ul := hb.UL().
 			ID(submenuId).
 			Class("collapse hide nav flex-column ms-1").
 			Data("bs-parent", "#DashboardMenu")
@@ -282,7 +282,7 @@ func (d *Dashboard) DashboardLayoutMenu() string {
 		items = append(items, li)
 	}
 
-	ul := hb.NewUL().
+	ul := hb.UL().
 		ID("DashboardMenu").
 		Class("navbar-nav justify-content-end flex-grow-1 pe-3").
 		Children(items)
@@ -313,7 +313,7 @@ func (d *Dashboard) topNavigation() string {
 
 	buttonTheme := d.navbarButtonThemeClass()
 
-	buttonMenuToggle := hb.NewButton().
+	buttonMenuToggle := hb.Button().
 		Class("btn "+buttonTheme).
 		Style("background: none; border:none;").
 		StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
@@ -321,10 +321,10 @@ func (d *Dashboard) topNavigation() string {
 		Data("bs-target", "#ModalDashboardMenu").
 		Children([]hb.TagInterface{
 			icons.Icon("bi-list", 24, 24, "").Style(iconStyle),
-			hb.NewSpan().HTML("Menu"),
+			hb.Span().HTML("Menu"),
 		})
 
-	buttonOffcanvasToggle := hb.NewButton().
+	buttonOffcanvasToggle := hb.Button().
 		Class("btn "+buttonTheme).
 		Style("background: none; border:none;").
 		StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
@@ -332,7 +332,7 @@ func (d *Dashboard) topNavigation() string {
 		Data("bs-target", "#OffcanvasMenu").
 		Children([]hb.TagInterface{
 			icons.Icon("bi-list", 24, 24, "").Style(iconStyle),
-			hb.NewSpan().HTML("Menu"),
+			hb.Span().HTML("Menu"),
 		})
 
 	mainMenu := buttonOffcanvasToggle
@@ -341,32 +341,30 @@ func (d *Dashboard) topNavigation() string {
 	}
 
 	logo := lo.
-		If(hasLogoRawHTML, hb.NewHTML(d.logoRawHtml)).
-		ElseIf(hasLogoImage, hb.NewImage().
-			Src(d.logoImageURL).
-			Style("max-height:35px;")).
+		If(hasLogoRawHTML, hb.Raw(d.logoRawHtml)).
+		ElseIf(hasLogoImage, hb.Image(d.logoImageURL).Style("max-height:35px;")).
 		Else(nil)
 
-	logoLink := hb.NewHyperlink().
+	logoLink := hb.Hyperlink().
 		Href(logoRedirectURL).
 		Class("navbar-brand").
 		Child(logo)
 
-	loginLink := hb.NewHyperlink().
+	loginLink := hb.Hyperlink().
 		Text("Login").
 		Href(d.loginURL).
 		Class("btn "+buttonTheme+" float-end").
 		StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
 		Style("margin-left:10px;  border:none;")
 
-	registerLink := hb.NewHyperlink().
+	registerLink := hb.Hyperlink().
 		Text("Register").
 		Href(d.registerURL).
 		Class("btn "+buttonTheme+" float-end").
 		StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
 		Style("margin-left:10px;  border:none;")
 
-	toolbar := hb.NewNav().
+	toolbar := hb.Nav().
 		ID("Toolbar").
 		Class("navbar").
 		ClassIf(d.navbarHasBackgroundThemeClass(), navbarThemeBackgroundClass).
@@ -379,7 +377,7 @@ func (d *Dashboard) topNavigation() string {
 
 			// User Menu
 			hb.If(!lo.IsEmpty(d.user) && (d.user.FirstName != "" || d.user.LastName != ""),
-				hb.NewDiv().Class("float-end").
+				hb.Div().Class("float-end").
 					Style("margin-left:10px;").
 					Child(dropdownUser),
 			),
@@ -396,13 +394,13 @@ func (d *Dashboard) topNavigation() string {
 
 			// Theme Switcher
 			hb.If(d.themeHandlerUrl != "",
-				hb.NewDiv().Class("float-end").
+				hb.Div().Class("float-end").
 					Style("margin-left:10px;").
 					Child(dropdownThemeSwitch),
 			),
 
 			// Quick Menu (if provided)
-			hb.If(len(d.quickAccessMenu) > 0, hb.NewDiv().
+			hb.If(len(d.quickAccessMenu) > 0, hb.Div().
 				Class("float-end").
 				Style("margin-left:10px;").
 				Child(dropdownQuickAccess)),
@@ -412,7 +410,7 @@ func (d *Dashboard) topNavigation() string {
 }
 
 func (d *Dashboard) center(content string) string {
-	contentHolder := hb.NewDiv().Class("shadow p-3 m-3").HTML(content)
+	contentHolder := hb.Div().Class("shadow p-3 m-3").HTML(content)
 	html := contentHolder.ToHTML()
 	return html
 }
@@ -420,28 +418,28 @@ func (d *Dashboard) center(content string) string {
 func (d *Dashboard) menuOffcanvas() *hb.Tag {
 	backgroundClass := d.navbarBackgroundThemeClass()
 
-	offcanvasMenu := hb.NewDiv().
+	offcanvasMenu := hb.Div().
 		ID("OffcanvasMenu").
 		Class("offcanvas offcanvas-start").
 		Class(backgroundClass).
 		ClassIfElse(backgroundClass == "bg-light", "text-bg-light", "text-bg-dark").
 		Attr("tabindex", "-1").
 		Children([]hb.TagInterface{
-			hb.NewDiv().Class("offcanvas-header").
+			hb.Div().Class("offcanvas-header").
 				Children([]hb.TagInterface{
-					hb.NewHeading5().
+					hb.Heading5().
 						Class("offcanvas-title").
 						Text("Menu"),
-					hb.NewButton().
+					hb.Button().
 						Class("btn-close btn-close-white").
 						ClassIf(backgroundClass == "bg-light", "text-bg-light").
 						Type(hb.TYPE_BUTTON).
 						Data("bs-dismiss", "offcanvas").
 						Attr("aria-label", "Close"),
 				}),
-			hb.NewDiv().Class("offcanvas-body").
+			hb.Div().Class("offcanvas-body").
 				Children([]hb.TagInterface{
-					hb.NewHTML(d.DashboardLayoutMenu()),
+					hb.Raw(d.DashboardLayoutMenu()),
 				}),
 		})
 
@@ -449,10 +447,10 @@ func (d *Dashboard) menuOffcanvas() *hb.Tag {
 }
 
 func (d *Dashboard) menuModal() *hb.Tag {
-	modalHeader := hb.NewDiv().Class("modal-header").
+	modalHeader := hb.Div().Class("modal-header").
 		Children([]hb.TagInterface{
-			hb.NewHeading5().HTML("Menu").Class("modal-title"),
-			hb.NewButton().Attrs(map[string]string{
+			hb.Heading5().HTML("Menu").Class("modal-title"),
+			hb.Button().Attrs(map[string]string{
 				"type":            "button",
 				"class":           "btn-close",
 				"data-bs-dismiss": "modal",
@@ -460,24 +458,24 @@ func (d *Dashboard) menuModal() *hb.Tag {
 			}),
 		})
 
-	modalBody := hb.NewDiv().Class("modal-body").Children([]hb.TagInterface{
-		hb.NewHTML(d.DashboardLayoutMenu()),
+	modalBody := hb.Div().Class("modal-body").Children([]hb.TagInterface{
+		hb.Raw(d.DashboardLayoutMenu()),
 	})
 
-	modalFooter := hb.NewDiv().Class("modal-footer").Children([]hb.TagInterface{
-		hb.NewButton().
+	modalFooter := hb.Div().Class("modal-footer").Children([]hb.TagInterface{
+		hb.Button().
 			HTML("Close").
 			Class("btn btn-secondary w-100").
 			Data("bs-dismiss", "modal"),
 	})
 
-	modal := hb.NewDiv().
+	modal := hb.Div().
 		ID("ModalDashboardMenu").
 		Class("modal fade").
 		Children([]hb.TagInterface{
-			hb.NewDiv().Class("modal-dialog modal-lg").
+			hb.Div().Class("modal-dialog modal-lg").
 				Children([]hb.TagInterface{
-					hb.NewDiv().Class("modal-content").
+					hb.Div().Class("modal-content").
 						Children([]hb.TagInterface{
 							modalHeader,
 							modalBody,
@@ -496,21 +494,21 @@ func (d *Dashboard) menuModal() *hb.Tag {
 // 	logoURL := d.LogoURL
 // 	if logoURL == "" {
 // 		logoURL = utils.ImgPlaceholderURL(120, 80, "Logo")
-// 		placeholderLogo := hb.NewImage().
+// 		placeholderLogo := hb.Image().
 // 			Src(logoURL).
 // 			Style("width:100%;margin:0px 10px 0px 0px;")
-// 		adminDiv := hb.NewDiv().
+// 		adminDiv := hb.Div().
 // 			HTML("ADMIN PANEL").
 // 			Style("font-size:12px;text-align: center;")
-// 		logo = hb.NewDiv().Class("Logo").Child(placeholderLogo).Child(adminDiv)
+// 		logo = hb.Div().Class("Logo").Child(placeholderLogo).Child(adminDiv)
 // 	} else {
-// 		logo = hb.NewImage().Attr("src", logoURL).Style("width:100%;margin:0px 10px 0px 0px;")
+// 		logo = hb.Image().Attr("src", logoURL).Style("width:100%;margin:0px 10px 0px 0px;")
 // 	}
 
-// 	sideMenu := hb.NewDiv().ID("SideMenu").Class("p-4").Style("height:100%;width:200px;").
+// 	sideMenu := hb.Div().ID("SideMenu").Class("p-4").Style("height:100%;width:200px;").
 // 		AddChildren([]hb.TagInterface{
 // 			logo,
-// 			hb.NewDiv().Class("Menu").HTML(menu),
+// 			hb.Div().Class("Menu").HTML(menu),
 // 		})
 // 	return sideMenu.ToHTML()
 // }
@@ -577,10 +575,10 @@ func (d *Dashboard) navbarDropdownQuickAccess(iconStyle string) *hb.Tag {
 	hasNavbarTextColor := lo.Ternary(d.navbarTextColor == "", false, true)
 	buttonTheme := d.navbarButtonThemeClass()
 
-	dropdownQuickAccess := hb.NewDiv().
+	dropdownQuickAccess := hb.Div().
 		Class("dropdown").
 		Children([]hb.TagInterface{
-			hb.NewButton().
+			hb.Button().
 				ID("ButtonUser").
 				Class("btn "+buttonTheme+" dropdown-toggle").
 				Style("background:none;border:0px;").
@@ -591,24 +589,24 @@ func (d *Dashboard) navbarDropdownQuickAccess(iconStyle string) *hb.Tag {
 					icons.Icon("bi-microsoft", 24, 24, "").
 						Style(iconStyle).
 						Style("margin-top:-4px;margin-right:8px;"),
-					hb.NewSpan().Text("Quick Access").Style("margin-right:10px;"),
+					hb.Span().Text("Quick Access").Style("margin-right:10px;"),
 				}),
-			hb.NewUL().
+			hb.UL().
 				Class("dropdown-menu").
 				Children(lo.Map(d.quickAccessMenu, func(item MenuItem, _ int) hb.TagInterface {
 					target := lo.Ternary(item.Target == "", "_self", item.Target)
 					url := lo.Ternary(item.URL == "", "#", item.URL)
 
-					return hb.NewLI().Children([]hb.TagInterface{
+					return hb.LI().Children([]hb.TagInterface{
 						hb.If(item.Title == "",
-							hb.NewHR().
+							hb.HR().
 								Class("dropdown-divider"),
 						),
 
 						hb.If(item.Title != "",
-							hb.NewHyperlink().
+							hb.Hyperlink().
 								Class("dropdown-item").
-								ChildIf(item.Icon != "", hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(item.Icon)).
+								ChildIf(item.Icon != "", hb.Span().Class("icon").Style("margin-right: 5px;").HTML(item.Icon)).
 								Text(item.Title).
 								Href(url).
 								Target(target),
@@ -644,10 +642,10 @@ func (d *Dashboard) navbarDropdownThemeSwitch() *hb.Tag {
 			}
 		}
 
-		return hb.NewLI().Children([]hb.TagInterface{
-			hb.NewHyperlink().
+		return hb.LI().Children([]hb.TagInterface{
+			hb.Hyperlink().
 				Class("dropdown-item"+active).
-				Child(hb.NewI().Class("bi bi-sun").Style("margin-right:5px;")).
+				Child(hb.I().Class("bi bi-sun").Style("margin-right:5px;")).
 				HTML(name).
 				Href(url).
 				Attr("ref", "nofollow"),
@@ -668,17 +666,17 @@ func (d *Dashboard) navbarDropdownThemeSwitch() *hb.Tag {
 			}
 		}
 
-		return hb.NewLI().Children([]hb.TagInterface{
-			hb.NewHyperlink().
+		return hb.LI().Children([]hb.TagInterface{
+			hb.Hyperlink().
 				Class("dropdown-item"+active).
-				Child(hb.NewI().Class("bi bi-moon-stars-fill").Style("margin-right:5px;")).
+				Child(hb.I().Class("bi bi-moon-stars-fill").Style("margin-right:5px;")).
 				HTML(name).
 				Href(url).
 				Attr("ref", "nofollow"),
 		})
 	})
 
-	return hb.NewDiv().
+	return hb.Div().
 		Class("dropdown").
 		Children([]hb.TagInterface{
 			bs.Button().
@@ -688,14 +686,14 @@ func (d *Dashboard) navbarDropdownThemeSwitch() *hb.Tag {
 				StyleIf(hasNavbarTextColor, "color:"+d.navbarTextColor).
 				Data("bs-toggle", "dropdown").
 				Children([]hb.TagInterface{
-					lo.Ternary(isDark, hb.NewI().Class("bi bi-sun"), hb.NewI().Class("bi bi-moon-stars-fill")),
+					lo.Ternary(isDark, hb.I().Class("bi bi-sun"), hb.I().Class("bi bi-moon-stars-fill")),
 				}),
-			hb.NewUL().Class(buttonTheme+" dropdown-menu dropdown-menu-dark").
+			hb.UL().Class(buttonTheme+" dropdown-menu dropdown-menu-dark").
 				Children(lightDropdownItems).
 				ChildIf(
 					len(lo.Filter(darkDropdownItems, func(item hb.TagInterface, _ int) bool { return item != nil })) > 0 && len(lo.Filter(lightDropdownItems, func(item hb.TagInterface, _ int) bool { return item != nil })) > 0,
-					hb.NewLI().Children([]hb.TagInterface{
-						hb.NewHR().Class("dropdown-divider"),
+					hb.LI().Children([]hb.TagInterface{
+						hb.HR().Class("dropdown-divider"),
 					}),
 				).
 				Children(darkDropdownItems),
@@ -706,10 +704,10 @@ func (d *Dashboard) navbarDropdownUser(iconStyle string) *hb.Tag {
 	hasNavbarTextColor := lo.Ternary(d.navbarTextColor == "", false, true)
 	buttonTheme := d.navbarButtonThemeClass()
 
-	dropdownUser := hb.NewDiv().
+	dropdownUser := hb.Div().
 		Class("dropdown").
 		Children([]hb.TagInterface{
-			hb.NewButton().
+			hb.Button().
 				ID("ButtonUser").
 				Class("btn "+buttonTheme+" dropdown-toggle").
 				Style("background:none;border:0px;").
@@ -718,27 +716,27 @@ func (d *Dashboard) navbarDropdownUser(iconStyle string) *hb.Tag {
 				Data("bs-toggle", "dropdown").
 				Children([]hb.TagInterface{
 					icons.Icon("bi-person", 24, 24, "").Style(iconStyle),
-					hb.NewSpan().
+					hb.Span().
 						Text(d.user.FirstName + " " + d.user.LastName).
 						Style("margin-right:10px;"),
 				}),
-			hb.NewUL().
+			hb.UL().
 				Class("dropdown-menu dropdown-menu-dark").
 				Class(buttonTheme).
 				Children(lo.Map(d.userMenu, func(item MenuItem, _ int) hb.TagInterface {
 					target := lo.Ternary(item.Target == "", "_self", item.Target)
 					url := lo.Ternary(item.URL == "", "#", item.URL)
 
-					return hb.NewLI().Children([]hb.TagInterface{
+					return hb.LI().Children([]hb.TagInterface{
 						hb.If(item.Title == "",
-							hb.NewHR().
+							hb.HR().
 								Class("dropdown-divider"),
 						),
 
 						hb.If(item.Title != "",
-							hb.NewHyperlink().
+							hb.Hyperlink().
 								Class("dropdown-item").
-								ChildIf(item.Icon != "", hb.NewSpan().Class("icon").Style("margin-right: 5px;").HTML(item.Icon)).
+								ChildIf(item.Icon != "", hb.Span().Class("icon").Style("margin-right: 5px;").HTML(item.Icon)).
 								Text(item.Title).
 								Href(url).
 								Target(target),

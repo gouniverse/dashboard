@@ -20,9 +20,9 @@ func styles(stylesArray []string) string {
 		}
 
 		if strings.HasPrefix(style, "http") || strings.HasPrefix(style, "//") {
-			style = hb.NewStyleURL(style).ToHTML()
+			style = hb.StyleURL(style).ToHTML()
 		} else if !strings.HasPrefix(style, "<style") {
-			style = hb.NewStyle(style).ToHTML()
+			style = hb.Style(style).ToHTML()
 		}
 
 		styles += style
