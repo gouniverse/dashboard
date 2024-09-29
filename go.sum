@@ -37,8 +37,8 @@ github.com/gouniverse/dataobject v0.3.0 h1:4m6zH8q3/Z159MrkX64gZO884SC2RE35FFzM1
 github.com/gouniverse/dataobject v0.3.0/go.mod h1:kGYa0bv14xCmkTCW2CpF9dIkh+S1N3O04c5eJY1jFqg=
 github.com/gouniverse/envenc v0.5.0 h1:u8eGUZvK5vxM4EdJxnIEGyZkSwBpOiilYFq2GDMq1H8=
 github.com/gouniverse/envenc v0.5.0/go.mod h1:11yi/KBuLs1GFdjysszZB5/JHKKslkh6v+UucLA5dKI=
-github.com/gouniverse/hb v1.77.1 h1:d57gPejmjtZv2IX3XjUNxztrO71Jpm1t3s6x3dvrsro=
-github.com/gouniverse/hb v1.77.1/go.mod h1:NpqGB1C2XmuG8RemolepbiKWLdL9UDqYTdT3IoNRv1g=
+github.com/gouniverse/hb v1.77.2 h1:bwlneoKLGgZIy2mU4N6MK07pyYxmJmElQqoDQ/S925Y=
+github.com/gouniverse/hb v1.77.2/go.mod h1:NpqGB1C2XmuG8RemolepbiKWLdL9UDqYTdT3IoNRv1g=
 github.com/gouniverse/icons v1.3.1 h1:CCiBmWRkUcREX1nSvW9lJD6IjII3m6LZJkKd3y/PhdI=
 github.com/gouniverse/icons v1.3.1/go.mod h1:VR4mbFpJyWeFmoNAicVAyBJ2LsxOyB04e+DxnqY4cCU=
 github.com/gouniverse/responses v0.6.0 h1:34KYyxYUqyXDslAuJMEKp5rM4CWpR23jmUwDaR0gJKo=

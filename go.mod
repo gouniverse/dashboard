@@ -5,7 +5,7 @@ go 1.23
 require (
 	github.com/gouniverse/bs v0.11.1
 	github.com/gouniverse/cdn v1.5.0
-	github.com/gouniverse/hb v1.77.1
+	github.com/gouniverse/hb v1.77.2
 	github.com/gouniverse/icons v1.3.1
 	github.com/gouniverse/responses v0.6.0
 	github.com/gouniverse/uncdn v0.7.4
