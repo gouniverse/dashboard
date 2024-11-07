@@ -353,7 +353,8 @@ func (d *Dashboard) topNavigation() string {
 	loginLink := hb.Hyperlink().
 		Text("Login").
 		Href(d.loginURL).
-		Class("btn "+buttonTheme+" float-end").
+		//Class("btn "+buttonTheme+" float-end").
+		Class("btn btn-outline-info float-end").
 		StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
 		Style("margin-left:10px;  border:none;")
 
@@ -575,45 +576,47 @@ func (d *Dashboard) navbarDropdownQuickAccess(iconStyle string) *hb.Tag {
 	hasNavbarTextColor := lo.Ternary(d.navbarTextColor == "", false, true)
 	buttonTheme := d.navbarButtonThemeClass()
 
+	button := hb.Button().
+		ID("ButtonQuickAccess").
+		Class("btn "+buttonTheme+" dropdown-toggle").
+		Style("background:none;border:0px;").
+		StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
+		Type(hb.TYPE_BUTTON).
+		Data("bs-toggle", "dropdown").
+		Children([]hb.TagInterface{
+			icons.Icon("bi-microsoft", 24, 24, "").
+				Style(iconStyle).
+				Style("margin-top:-4px;margin-right:8px;"),
+			hb.Span().Text("Quick Access").Style("margin-right:10px;"),
+		})
+
 	dropdownQuickAccess := hb.Div().
 		Class("dropdown").
-		Children([]hb.TagInterface{
-			hb.Button().
-				ID("ButtonUser").
-				Class("btn "+buttonTheme+" dropdown-toggle").
-				Style("background:none;border:0px;").
-				StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
-				Type(hb.TYPE_BUTTON).
-				Data("bs-toggle", "dropdown").
-				Children([]hb.TagInterface{
-					icons.Icon("bi-microsoft", 24, 24, "").
-						Style(iconStyle).
-						Style("margin-top:-4px;margin-right:8px;"),
-					hb.Span().Text("Quick Access").Style("margin-right:10px;"),
-				}),
-			hb.UL().
-				Class("dropdown-menu").
-				Children(lo.Map(d.quickAccessMenu, func(item MenuItem, _ int) hb.TagInterface {
-					target := lo.Ternary(item.Target == "", "_self", item.Target)
-					url := lo.Ternary(item.URL == "", "#", item.URL)
+		Style(`margin:0px;`).
+		Child(button).
+		Child(hb.UL().
+			Class("dropdown-menu").
+			Children(lo.Map(d.quickAccessMenu, func(item MenuItem, _ int) hb.TagInterface {
+				target := lo.Ternary(item.Target == "", "_self", item.Target)
+				url := lo.Ternary(item.URL == "", "#", item.URL)
 
-					return hb.LI().Children([]hb.TagInterface{
-						hb.If(item.Title == "",
-							hb.HR().
-								Class("dropdown-divider"),
-						),
+				return hb.LI().Children([]hb.TagInterface{
+					hb.If(item.Title == "",
+						hb.HR().
+							Class("dropdown-divider"),
+					),
 
-						hb.If(item.Title != "",
-							hb.Hyperlink().
-								Class("dropdown-item").
-								ChildIf(item.Icon != "", hb.Span().Class("icon").Style("margin-right: 5px;").HTML(item.Icon)).
-								Text(item.Title).
-								Href(url).
-								Target(target),
-						),
-					})
-				})),
-		})
+					hb.If(item.Title != "",
+						hb.Hyperlink().
+							Class("dropdown-item").
+							ChildIf(item.Icon != "", hb.Span().Class("icon").Style("margin-right: 5px;").HTML(item.Icon)).
+							Text(item.Title).
+							Href(url).
+							Target(target),
+					),
+				})
+			})))
+
 	return dropdownQuickAccess
 }
 
@@ -676,28 +679,30 @@ func (d *Dashboard) navbarDropdownThemeSwitch() *hb.Tag {
 		})
 	})
 
+	button := bs.Button().
+		ID("buttonTheme").
+		Class(buttonTheme+" dropdown-toggle").
+		Style("background:none;border:0px;").
+		StyleIf(hasNavbarTextColor, "color:"+d.navbarTextColor).
+		Data("bs-toggle", "dropdown").
+		Children([]hb.TagInterface{
+			lo.Ternary(isDark, hb.I().Class("bi bi-sun"), hb.I().Class("bi bi-moon-stars-fill")),
+		})
+
 	return hb.Div().
 		Class("dropdown").
-		Children([]hb.TagInterface{
-			bs.Button().
-				ID("buttonTheme").
-				Class(buttonTheme+" dropdown-toggle").
-				Style("background:none;border:0px;").
-				StyleIf(hasNavbarTextColor, "color:"+d.navbarTextColor).
-				Data("bs-toggle", "dropdown").
-				Children([]hb.TagInterface{
-					lo.Ternary(isDark, hb.I().Class("bi bi-sun"), hb.I().Class("bi bi-moon-stars-fill")),
+		Style(`margin:0px;`).
+		Child(button).
+		Child(hb.UL().
+			Class(buttonTheme+" dropdown-menu dropdown-menu-dark").
+			Children(lightDropdownItems).
+			ChildIf(
+				len(lo.Filter(darkDropdownItems, func(item hb.TagInterface, _ int) bool { return item != nil })) > 0 && len(lo.Filter(lightDropdownItems, func(item hb.TagInterface, _ int) bool { return item != nil })) > 0,
+				hb.LI().Children([]hb.TagInterface{
+					hb.HR().Class("dropdown-divider"),
 				}),
-			hb.UL().Class(buttonTheme+" dropdown-menu dropdown-menu-dark").
-				Children(lightDropdownItems).
-				ChildIf(
-					len(lo.Filter(darkDropdownItems, func(item hb.TagInterface, _ int) bool { return item != nil })) > 0 && len(lo.Filter(lightDropdownItems, func(item hb.TagInterface, _ int) bool { return item != nil })) > 0,
-					hb.LI().Children([]hb.TagInterface{
-						hb.HR().Class("dropdown-divider"),
-					}),
-				).
-				Children(darkDropdownItems),
-		})
+			).
+			Children(darkDropdownItems))
 }
 
 func (d *Dashboard) navbarDropdownUser(iconStyle string) *hb.Tag {
