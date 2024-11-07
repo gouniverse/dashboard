@@ -1,14 +1,24 @@
 # Dashboard <a href="https://gitpod.io/#https://github.com/gouniverse/dashboard" style="float:right;"><img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in Gitpod" loading="lazy"></a>
 
+![tests](https://github.com/gouniverse/dashboard/workflows/tests/badge.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/gouniverse/dashboard)](https://goreportcard.com/report/github.com/gouniverse/dashboard)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/gouniverse/dashboard)](https://pkg.go.dev/github.com/gouniverse/dashboard)
+
 This is a project for quickly building dashboards.
 
-- Uses the latest Bootstrap 5.3.1
-- Uses the latest Bootstrap Icons
+- Uses the latest [Bootstrap](https://getbootstrap.com) (v5.3.3)
+- Uses the latest [Bootstrap Icons](https://icons.getbootstrap.com/) (v1.11.3)
 - Preset sidebar menu
 - Preset user dropdown menu
 - Preset quick access menu
 - Preset menu switcher
-- Supported all Bootswatch themes
+- Supported all [Bootswatch](https://bootswatch.com/) themes (26 total)
+
+## License
+
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). You can find a copy of the license at [https://www.gnu.org/licenses/agpl-3.0.en.html](https://www.gnu.org/licenses/agpl-3.0.txt)
+
+For commercial use, please use my [contact page](https://lesichkov.co.uk/contact) to obtain a commercial license.
 
 ## Example
 

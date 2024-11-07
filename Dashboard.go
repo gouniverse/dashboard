@@ -121,7 +121,7 @@ func (d *Dashboard) ToHTML() string {
 	if d.uncdnHandlerEndpoint != "" {
 		scriptURLs = append(scriptURLs, uncdn.BootstrapJs523())
 	} else {
-		scriptURLs = append(scriptURLs, cdn.BootstrapJs_5_3_1())
+		scriptURLs = append(scriptURLs, cdn.BootstrapJs_5_3_3())
 	}
 
 	faviconURL := d.faviconURL
@@ -192,7 +192,6 @@ func buildSubmenuItem(menuItem MenuItem, index int) *hb.Tag {
 
 	children := menuItem.Children
 	hasChildren := len(children) > 0
-	// menuId := "menu_" + utils.ToString(index)
 	submenuId := "submenu_" + utils.ToString(index)
 	if hasChildren {
 		url = "#" + submenuId
@@ -206,11 +205,9 @@ func buildSubmenuItem(menuItem MenuItem, index int) *hb.Tag {
 			Style("margin-right: 5px;").
 			HTML(icon))
 	} else {
-		link.Child(hb.Raw(`
-		    <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
-		        <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-		    </svg>
-		`))
+		link.Child(hb.Raw(`<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
+	<path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+</svg>`))
 	}
 	link.Child(hb.Span().Class("d-inline").HTML(title))
 	link.Href(url)
