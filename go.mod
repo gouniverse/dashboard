@@ -23,7 +23,7 @@ require (
 	github.com/gouniverse/api v1.6.0 // indirect
 	github.com/gouniverse/crypto v0.2.0 // indirect
 	github.com/gouniverse/dataobject v0.3.0 // indirect
-	github.com/gouniverse/envenc v0.7.0 // indirect
+	github.com/gouniverse/envenc v0.8.0 // indirect
 	github.com/gouniverse/uid v1.5.0 // indirect
 	github.com/gouniverse/webserver v0.1.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect

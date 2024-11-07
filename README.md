@@ -20,22 +20,6 @@ For commercial use, please use my [contact page](https://lesichkov.co.uk/contact
 
 ## Features
 
-This is a project for quickly building a dashboard.
-
-Out of the box it provides a general layout, main menu,
-user dropdown menu, quick access menu, and theme switcher.
-
-The content of the page itself is left blank. It is up to the developer
-to customize the pages as needed by the application he is building.
-
-## License
-
-This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). You can find a copy of the license at [https://www.gnu.org/licenses/agpl-3.0.en.html](https://www.gnu.org/licenses/agpl-3.0.txt)
-
-For commercial use, please use my [contact page](https://lesichkov.co.uk/contact) to obtain a commercial license.
-
-## Features
-
 - Uses the latest [Bootstrap](https://getbootstrap.com) (v5.3.3)
 - Uses the latest [Bootstrap Icons](https://icons.getbootstrap.com/) (v1.11.3)
 - Preset sidebar menu

@@ -35,8 +35,8 @@ github.com/gouniverse/crypto v0.2.0 h1:7ppqn9FrwrlC6nTfgVBnEop5cKBFNEZyP5yXoUH7M
 github.com/gouniverse/crypto v0.2.0/go.mod h1:uWfzSf1dsYyij6yrVTdxuLFfLZIvSJu24+x3sj+DLXU=
 github.com/gouniverse/dataobject v0.3.0 h1:4m6zH8q3/Z159MrkX64gZO884SC2RE35FFzM186ohU8=
 github.com/gouniverse/dataobject v0.3.0/go.mod h1:kGYa0bv14xCmkTCW2CpF9dIkh+S1N3O04c5eJY1jFqg=
-github.com/gouniverse/envenc v0.7.0 h1:8JZ4bNHYaDsXqYZzZISAI9P//ds0Z+2Q2kQFJxNQnaE=
-github.com/gouniverse/envenc v0.7.0/go.mod h1:TTa/whXbsQUopA8dMWjHXvAcyLZaTTrScbM4sMcIfDI=
+github.com/gouniverse/envenc v0.8.0 h1:pt1DVRrRXdxk4eA6vm0SBCdPrgXaF1EsDUq6tgXfpFs=
+github.com/gouniverse/envenc v0.8.0/go.mod h1:bdRPykXWVTAJfpEDht/iMqFtj/iigw2dqJci5dp/f8A=
 github.com/gouniverse/hb v1.78.0 h1:Cm0Ge9EkT1eWrEw6zTynz0AKJS7FLtYx8tluftl3m3w=
 github.com/gouniverse/hb v1.78.0/go.mod h1:WDUCGoptHp/fAYT634lQ2846sGx88yXOOWMvlEaezYM=
 github.com/gouniverse/icons v1.3.1 h1:CCiBmWRkUcREX1nSvW9lJD6IjII3m6LZJkKd3y/PhdI=
