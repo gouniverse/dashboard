@@ -71,7 +71,7 @@ type Dashboard struct {
 	// Optional. The theme names to be visible in the theme switcher, the key is the theme, the value is the theme name (can be customized, default will be used otherwise)
 	themesRestrict map[string]string
 
-	// Optional. The URL of the UNCDN hadler endpoint to use
+	// Optional. The URL of the UNCDN handler endpoint to use
 	uncdnHandlerEndpoint string
 }
 
@@ -353,7 +353,7 @@ func (d *Dashboard) topNavigation() string {
 		//Class("btn "+buttonTheme+" float-end").
 		Class("btn btn-outline-info float-end").
 		StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
-		Style("margin-left:10px;  border:none;")
+		Style("margin-left:10px;")
 
 	registerLink := hb.Hyperlink().
 		Text("Register").
