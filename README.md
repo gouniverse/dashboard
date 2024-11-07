@@ -1,6 +1,20 @@
 # Dashboard <a href="https://gitpod.io/#https://github.com/gouniverse/dashboard" style="float:right;"><img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in Gitpod" loading="lazy"></a>
 
-This is a project for quickly building dashboards.
+This is a project for quickly building a dashboard.
+
+Out of the box it provides a general layout, main menu,
+user dropdown menu, quick access menu, and theme switcher.
+
+The content of the page itself is left blank. It is up to the developer
+to customize the pages as needed by the application he is building.
+
+## License
+
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). You can find a copy of the license at [https://www.gnu.org/licenses/agpl-3.0.en.html](https://www.gnu.org/licenses/agpl-3.0.txt)
+
+For commercial use, please use my [contact page](https://lesichkov.co.uk/contact) to obtain a commercial license.
+
+## Features
 
 - Uses the latest Bootstrap 5.3.1
 - Uses the latest Bootstrap Icons
