@@ -688,7 +688,7 @@ func (d *Dashboard) navbarDropdownThemeSwitch() *hb.Tag {
 
 	return hb.Div().
 		Class("dropdown").
-		Style(`margin:0px;`).
+		// Style(`margin:0px;`).
 		Child(button).
 		Child(hb.UL().
 			Class(buttonTheme+" dropdown-menu dropdown-menu-dark").
