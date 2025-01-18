@@ -40,18 +40,19 @@ func dashboard(w http.ResponseWriter, r *http.Request) {
 				Title: "Home",
 				URL:   "/",
 			},
-            		{
+			{
 				Title: "Logout",
 				URL:   "/auth/logout",
 			},
 		},
 	})
-	html := dashboard.ToHTML()
-	w.Write([]byte(html))
+
+	w.Write([]byte(dashboard.ToHTML()))
 }
 ```
 
-- Adding to layout function, to reuse on multiple places
+- Adding to a layout function, to reuse on multiple places
+
 ```golang
 func layout(r *http.Request, opts AdminDashboardOptions) string {
     authUser := helpers.GetAuthUser(r)
