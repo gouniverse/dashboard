@@ -588,7 +588,10 @@ func (d *Dashboard) navbarDropdownQuickAccess(iconStyle string) *hb.Tag {
 			icons.Icon("bi-microsoft", 24, 24, "").
 				Style(iconStyle).
 				Style("margin-top:-4px;margin-right:8px;"),
-			hb.Span().Text("Quick Access").Style("margin-right:10px;"),
+			hb.Span().
+				Class("d-none d-md-inline-block").
+				Text("Quick Access").
+				Style("margin-right:10px;"),
 		})
 
 	dropdownQuickAccess := hb.Div().
