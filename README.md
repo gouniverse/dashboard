@@ -160,6 +160,10 @@ task dev:init
 task dev
 ```
 
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/gouniverse/dashboard.svg)](https://starchart.cc/gouniverse/dashboard)
+
 ## Noteworthy
 
 - https://github.com/pro-dev-ph/bootstrap-simple-admin-template
