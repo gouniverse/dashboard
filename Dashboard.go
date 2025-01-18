@@ -318,7 +318,9 @@ func (d *Dashboard) topNavigation() string {
 		Data("bs-target", "#ModalDashboardMenu").
 		Children([]hb.TagInterface{
 			icons.Icon("bi-list", 24, 24, "").Style(iconStyle),
-			hb.Span().HTML("Menu"),
+			hb.Span().
+				Class("d-none d-md-inline-block").
+				HTML("Menu"),
 		})
 
 	buttonOffcanvasToggle := hb.Button().
@@ -329,7 +331,9 @@ func (d *Dashboard) topNavigation() string {
 		Data("bs-target", "#OffcanvasMenu").
 		Children([]hb.TagInterface{
 			icons.Icon("bi-list", 24, 24, "").Style(iconStyle),
-			hb.Span().HTML("Menu"),
+			hb.Span().
+				Class("d-none d-md-inline-block").
+				HTML("Menu"),
 		})
 
 	mainMenu := buttonOffcanvasToggle
@@ -705,6 +709,7 @@ func (d *Dashboard) navbarDropdownThemeSwitch() *hb.Tag {
 func (d *Dashboard) navbarDropdownUser(iconStyle string) *hb.Tag {
 	hasNavbarTextColor := lo.Ternary(d.navbarTextColor == "", false, true)
 	buttonTheme := d.navbarButtonThemeClass()
+	userName := d.user.FirstName + " " + d.user.LastName
 
 	dropdownUser := hb.Div().
 		Class("dropdown").
@@ -719,7 +724,8 @@ func (d *Dashboard) navbarDropdownUser(iconStyle string) *hb.Tag {
 				Children([]hb.TagInterface{
 					icons.Icon("bi-person", 24, 24, "").Style(iconStyle),
 					hb.Span().
-						Text(d.user.FirstName + " " + d.user.LastName).
+						Class("d-none d-md-inline-block").
+						Text(userName).
 						Style("margin-right:10px;"),
 				}),
 			hb.UL().
