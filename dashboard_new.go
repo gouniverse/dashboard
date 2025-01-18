@@ -30,16 +30,21 @@ func NewDashboard(config Config) *Dashboard {
 	dashboard.scriptURLs = config.ScriptURLs
 	dashboard.styles = config.Styles
 	dashboard.styleURLs = config.StyleURLs
-	dashboard.menuType = config.MenuType
 	dashboard.redirectUrl = config.RedirectUrl
 	dashboard.redirectTime = config.RedirectTime
 	dashboard.themeHandlerUrl = config.ThemeHandlerUrl
 	dashboard.theme = config.Theme
 	dashboard.themesRestrict = config.ThemesRestrict
 	dashboard.uncdnHandlerEndpoint = config.UncdnHandlerEndpoint
-	dashboard.menu = config.Menu
+
+	dashboard.menuItems = config.MenuItems
+	dashboard.menuShowText = config.MenuShowText
+	dashboard.menuType = config.MenuType
+
 	dashboard.quickAccessMenu = config.QuickAccessMenu
+
 	dashboard.user = config.User
 	dashboard.userMenu = config.UserMenu
+
 	return dashboard
 }

@@ -59,7 +59,7 @@ func layout(r *http.Request, opts AdminDashboardOptions) string {
     logoImageURL = "YOUR_IMAGE_URL.png"
 	logoRedirectURL = "/"
 
-    dashboardMenu := []dashboard.MenuItem{
+    dashboardMenuItems := []dashboard.MenuItem{
             {
                 Title: "Home",
                 URL:   links.NewAdminLinks().Home(map[string]string{}),
@@ -81,9 +81,9 @@ func layout(r *http.Request, opts AdminDashboardOptions) string {
     dashboardUser := dashboard.User{
             FirstName: authUser.FirstName(),
             LastName:  authUser.LastName(),
-        }
+    }
 
-    dashboardQuickAccessMenu := []dashboard.MenuItem {
+    dashboardQuickAccessMenuItems := []dashboard.MenuItem {
         {
             Title: "New post",
             URL: "/post-create",
@@ -94,7 +94,7 @@ func layout(r *http.Request, opts AdminDashboardOptions) string {
         }
     }
         
-    dashboardUserMenu := []dashboard.MenuItem {
+    dashboardUserMenuItems := []dashboard.MenuItem {
         {
             Title: "Profile",
             URL: "/account/profile",
@@ -111,10 +111,10 @@ func layout(r *http.Request, opts AdminDashboardOptions) string {
         Title:                      opts.Title,
         LogoImageURL                logoImageURL,
         LogoRedirectURL             logoRedirectURL,
-        Menu:                       dashboardMenu,
+        MenuItems:                  dashboardMenuItems,
         User:                       dashboardUser,
-        UserMenu:                   dashboardUserMenu,
-        QuickAccessMenu:            dashboardQuickAccessMenu,
+        UserMenuItems:              dashboardUserMenuItems,
+        QuickAccessMenuItems:       dashboardQuickAccessMenuItems,
         Scripts:                    opts.Scripts,
         ScriptURLs:                 opts.ScriptURLs,
         Styles:                     opts.Styles,

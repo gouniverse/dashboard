@@ -11,8 +11,15 @@ type Config struct {
 	FaviconURL  string
 	HTTPRequest *http.Request
 	LogoURL     string
-	Menu        []MenuItem
-	MenuType    string
+
+	// Should the menu text be shown
+	MenuShowText bool
+
+	// The menu items to display in the main menu
+	MenuItems []MenuItem
+
+	// MenuType can be MENU_TYPE_OFFCANVAS or MENU_TYPE_MODAL
+	MenuType string
 
 	// Optional. The URL of the logo image
 	LogoImageURL string

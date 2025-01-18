@@ -16,8 +16,19 @@ const MENU_TYPE_MODAL = "modal"
 const MENU_TYPE_OFFCANVAS = "offcanvas"
 
 type Dashboard struct {
-	menu     []MenuItem
-	user     User
+	// The menu items for the main menu
+	menuItems []MenuItem
+
+	// Whether to show the menu text (default false)
+	menuShowText bool
+
+	// Optional. The type of the main menu (see MENU_TYPE_* constants)
+	menuType string
+
+	// The currently logged in user (default nil)
+	user User
+
+	// The menu items for the user dropdown
 	userMenu []MenuItem
 
 	// Optional. Menu for quick access to various pages
@@ -38,9 +49,6 @@ type Dashboard struct {
 	// Optional. The URL of the register page to use (if user is not provided)
 	registerURL string
 
-	// Optional. The type of the main menu (see MENU_TYPE_* constants)
-	menuType string
-
 	// Optional. The web page title of the dashboard
 	title string
 
@@ -52,6 +60,7 @@ type Dashboard struct {
 
 	// Optional. The URL of the logo (base64 encoded can be used, default will be used otherwise)
 	logoImageURL string
+
 	// Optional. Raw HTML of the logo, if set will be used instead of logoImageURL
 	logoRawHtml     string
 	logoRedirectURL string
@@ -88,12 +97,12 @@ func (d *Dashboard) SetUser(user User) *Dashboard {
 	return d
 }
 
-func (d *Dashboard) SetMenu(menuItems []MenuItem) *Dashboard {
-	d.menu = menuItems
+func (d *Dashboard) SetMenuItems(menuItems []MenuItem) *Dashboard {
+	d.menuItems = menuItems
 	return d
 }
 
-func (d *Dashboard) SetUserMenu(menuItems []MenuItem) *Dashboard {
+func (d *Dashboard) SetUserMenuItems(menuItems []MenuItem) *Dashboard {
 	d.userMenu = menuItems
 	return d
 }
@@ -242,10 +251,11 @@ func buildMenuItem(menuItem MenuItem, index int) *hb.Tag {
 		link.Child(hb.Span().Class("icon").Style("margin-right: 5px;").HTML(icon))
 	}
 	link.HTML(title)
-	link.Attr("href", url)
+	link.Href(url)
 	if hasChildren {
 		link.Data("bs-toggle", "collapse")
 	}
+
 	if hasChildren {
 		html := `<b class="caret">
 			<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16">
@@ -274,7 +284,8 @@ func buildMenuItem(menuItem MenuItem, index int) *hb.Tag {
 
 func (d *Dashboard) DashboardLayoutMenu() string {
 	items := []hb.TagInterface{}
-	for index, menuItem := range d.menu {
+
+	for index, menuItem := range d.menuItems {
 		li := buildMenuItem(menuItem, index)
 		items = append(items, li)
 	}
@@ -329,12 +340,10 @@ func (d *Dashboard) topNavigation() string {
 		StyleIf(hasNavbarTextColor, "color: "+d.navbarTextColor+";").
 		Data("bs-toggle", "offcanvas").
 		Data("bs-target", "#OffcanvasMenu").
-		Children([]hb.TagInterface{
-			icons.Icon("bi-list", 24, 24, "").Style(iconStyle),
-			hb.Span().
-				Class("d-none d-md-inline-block").
-				HTML("Menu"),
-		})
+		Child(icons.Icon("bi-list", 24, 24, "").Style(iconStyle)).
+		ChildIf(d.menuShowText, hb.Span().
+			Class("d-none d-md-inline-block").
+			HTML("Menu"))
 
 	mainMenu := buttonOffcanvasToggle
 	if d.menuType == MENU_TYPE_MODAL {
