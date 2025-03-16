@@ -27,6 +27,131 @@ For commercial use, please use my [contact page](https://lesichkov.co.uk/contact
 - Preset quick access menu
 - Preset menu switcher
 - Supported all [Bootswatch](https://bootswatch.com/) themes (26 total)
+- Flexible component system for building UI elements
+- Consistent functional API for all components
+
+## Components
+
+The dashboard includes a flexible component system that allows you to build custom UI elements. All components follow a consistent functional pattern that returns `hb.TagInterface` directly, making them easy to compose and combine.
+
+### ShadowBoxComponent
+
+The ShadowBoxComponent adds shadow, padding, and margin to your content, giving it a clean, separated look.
+
+```golang
+shadowBox := components.NewShadowBoxComponent(components.ShadowBoxConfig{
+    Content: "<h1>Hello World</h1>",
+    Padding: 15,
+    Margin: 10,
+})
+```
+
+### Card Component
+
+The Card component creates a Bootstrap card with an optional title and customizable styling.
+
+```golang
+card := components.NewCard(components.CardConfig{
+    Title:   "Card Title",
+    Content: "<p>This is content inside a Bootstrap card component.</p>",
+    Margin:  10,
+})
+```
+
+### Tab Layout Component
+
+The TabLayout component organizes content into tabs that users can switch between.
+
+```golang
+tabLayout := components.NewTabLayout(components.TabLayoutConfig{
+    Items: []components.TabItem{
+        {
+            ID:      "tab1",
+            Title:   "First Tab",
+            Content: "<p>Content of the first tab.</p>",
+            Active:  true,
+        },
+        {
+            ID:      "tab2",
+            Title:   "Second Tab",
+            Content: "<p>Content of the second tab.</p>",
+        },
+    },
+    Margin: 10,
+})
+```
+
+### Grid Component
+
+The Grid component creates a responsive Bootstrap grid system with rows and columns.
+
+```golang
+// Create a grid layout with two rows
+row1 := []components.GridItem{
+    {Content: "<div class='p-3 bg-light'>Column 1</div>", ColumnClass: "col-md-6"},
+    {Content: "<div class='p-3 bg-light'>Column 2</div>", ColumnClass: "col-md-6"},
+}
+
+// Second row with three columns of different widths
+row2 := []components.GridItem{
+    {Content: "<div class='p-3 bg-light'>Column 1</div>", ColumnClass: "col-md-3"},
+    {Content: "<div class='p-3 bg-light'>Column 2</div>", ColumnClass: "col-md-6"},
+    {Content: "<div class='p-3 bg-light'>Column 3</div>", ColumnClass: "col-md-3"},
+}
+
+grid := components.NewGridComponent(components.GridLayoutConfig{
+    Rows:    [][]components.GridItem{row1, row2},
+    Gutters: 3,
+    Margin:  10,
+})
+```
+
+### Combining Components
+
+Components can be easily combined by using the `.ToHTML()` method:
+
+```golang
+// Create tabs
+tabs := components.NewTabLayout(components.TabLayoutConfig{
+    Items: []components.TabItem{
+        {
+            ID:      "tab1",
+            Title:   "First Tab",
+            Content: "<p>Content of the first tab.</p>",
+            Active:  true,
+        },
+        {
+            ID:      "tab2",
+            Title:   "Second Tab",
+            Content: "<p>Content of the second tab.</p>",
+        },
+    },
+})
+
+// Put the tabs inside a card
+card := components.NewCard(components.CardConfig{
+    Title:   "Card with Tabs",
+    Content: tabs.ToHTML(),
+})
+
+// Put the card inside a shadow box
+shadowBox := components.NewShadowBoxComponent(components.ShadowBoxConfig{
+    Content: card.ToHTML(),
+    Padding: 15,
+    Margin:  10,
+})
+```
+
+## Running the Examples
+
+The dashboard includes a runnable example that demonstrates all the components in action:
+
+```bash
+cd examples
+go run component_examples.go
+```
+
+Then open your browser to http://localhost:8080 to see the examples.
 
 ## Example
 

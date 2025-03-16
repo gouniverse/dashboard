@@ -63,7 +63,7 @@ type Config struct {
 	// Optional. The URL of the theme switcher endpoint to use
 	ThemeHandlerUrl string
 
-	// Optional. The themes to be visible in the theme switcher, the key is the theme, the value is the name (can be customized, default will be used otherwise)
+	// Optional. The theme names to be visible in the theme switcher, the key is the theme, the value is the name (can be customized, default will be used otherwise)
 	ThemesRestrict map[string]string
 
 	Title                string

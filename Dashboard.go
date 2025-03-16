@@ -421,9 +421,7 @@ func (d *Dashboard) topNavigation() string {
 }
 
 func (d *Dashboard) center(content string) string {
-	contentHolder := hb.Div().Class("shadow p-3 m-3").HTML(content)
-	html := contentHolder.ToHTML()
-	return html
+	return content
 }
 
 func (d *Dashboard) menuOffcanvas() *hb.Tag {
