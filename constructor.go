@@ -1,8 +1,16 @@
 package dashboard
 
-// NewDashboard creates a new Dashboard instance based on the given configuration.
+// NewDashboard creates a new Dashboard instance based on
+// the given configuration.
 //
-// The function takes a Config struct as its parameter and returns a pointer to a Dashboard struct.
+// The function takes a Config struct as its parameter
+// and returns a pointer to a Dashboard struct.
+//
+// Parameters:
+// - config: A Config struct containing the configuration for the dashboard.
+//
+// Returns:
+// - A pointer to a Dashboard struct.
 func NewDashboard(config Config) *Dashboard {
 	if config.MenuType == "" {
 		config.MenuType = MENU_TYPE_OFFCANVAS // default
