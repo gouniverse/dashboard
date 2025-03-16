@@ -136,19 +136,19 @@ func layout(r *http.Request, opts AdminDashboardOptions) string {
 
 - Main View
 
-<img src="./screenshots/Screenshot_MainView_20230712.png" />
+<img src="./screenshots/screenshot_main_view_20230712.png" />
 
 - Main Menu
 
-<img src="./screenshots/Screenshot_MainMenu_20230712.png" />
+<img src="./screenshots/screenshot_main_menu_20230712.png" />
 
 - Quick Access Menu
 
-<img src="./screenshots/Screenshot_QuickAccessMenu_20230712.png" />
+<img src="./screenshots/screenshot_quick_access_menu_20230712.png" />
 
 - User Menu
 
-<img src="./screenshots/Screenshot_UserMenu_20230712.png" />
+<img src="./screenshots/screenshot_user_menu_20230712.png" />
 
 ## Development
 For working on this package:
